@@ -9,6 +9,14 @@ async function build() {
         format: 'esm',
         outdir: 'app/assets/builds',
         publicPath: '/assets',
+        loader: {
+            '.css': 'css',
+            '.woff': 'file',
+            '.woff2': 'file',
+            '.ttf': 'file',
+            '.eot': 'file',
+            '.svg': 'file',
+        },
         plugins: [vuePlugin()]
     });
 

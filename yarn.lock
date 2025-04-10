@@ -251,6 +251,11 @@
     "@parcel/watcher-win32-ia32" "2.5.1"
     "@parcel/watcher-win32-x64" "2.5.1"
 
+"@popperjs/core@^2.11.8":
+  version "2.11.8"
+  resolved "https://registry.npmjs.org/@popperjs/core/-/core-2.11.8.tgz"
+  integrity sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==
+
 "@tailwindcss/cli@^4.0.14":
   version "4.1.3"
   resolved "https://registry.npmjs.org/@tailwindcss/cli/-/cli-4.1.3.tgz"
@@ -425,6 +430,16 @@
   version "3.5.13"
   resolved "https://registry.npmjs.org/@vue/shared/-/shared-3.5.13.tgz"
   integrity sha512-/hnE/qP5ZoGpol0a5mDi45bOd7t3tjYJBjsgCsivow7D48cJeV5l05RD82lPqi7gRiphZM37rnhW1l6ZoCNNnQ==
+
+bootstrap-vue-next@^0.28.5:
+  version "0.28.5"
+  resolved "https://registry.npmjs.org/bootstrap-vue-next/-/bootstrap-vue-next-0.28.5.tgz"
+  integrity sha512-eC90kAlafoLiHsWeUnHn8bUZXzLFo5e6F+eQ8/Mpu1WpF0n+z+Fpd6c/yhLNFVsf8rgCyde6EeqACGSuuwZdYA==
+
+bootstrap@^5.3.0:
+  version "5.3.5"
+  resolved "https://registry.npmjs.org/bootstrap/-/bootstrap-5.3.5.tgz"
+  integrity sha512-ct1CHKtiobRimyGzmsSldEtM03E8fcEX4Tb3dGXz1V8faRwM50+vfHwTzOxB3IlKO7m+9vTH3s/3C6T2EAPeTA==
 
 braces@^3.0.3:
   version "3.0.3"
