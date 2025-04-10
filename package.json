@@ -1,0 +1,16 @@
+{
+  "name": "app",
+  "private": true,
+  "scripts": {
+    "build": "node esbuild.config.js",
+    "build:css": "npx @tailwindcss/cli -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/application.css --minify"
+  },
+  "dependencies": {
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.0.14",
+    "esbuild": "^0.25.1",
+    "esbuild-plugin-vue3": "^0.4.2"
+  }
+}
