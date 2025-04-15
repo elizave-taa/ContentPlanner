@@ -10,6 +10,9 @@ async function build() {
         outdir: 'app/assets/builds',
         publicPath: '/assets',
         loader: {
+            '.png': 'file',       // Добавлено для PNG
+            '.jpg': 'file',       // Добавлено для JPG
+            '.jpeg': 'file',      // Добавлено для JPEG
             '.css': 'css',
             '.woff': 'file',
             '.woff2': 'file',
