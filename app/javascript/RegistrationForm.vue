@@ -30,6 +30,8 @@ export default {
           type="tel"
           placeholder="Номер телефона"
           required
+          :invalid-feedback="invalidFeedback"
+          :state="state"
       />
     </BFormGroup>
 
@@ -45,6 +47,8 @@ export default {
           type="text"
           placeholder="Имя пользователя"
           required
+          :invalid-feedback="invalidFeedback"
+          :state="state"
       />
     </BFormGroup>
 
@@ -60,6 +64,8 @@ export default {
           type="password"
           placeholder="Пароль"
           required
+          :invalid-feedback="invalidFeedback"
+          :state="state"
       />
     </BFormGroup>
 
@@ -75,6 +81,8 @@ export default {
           type="email"
           placeholder="Email"
           required
+          :invalid-feedback="invalidFeedback"
+          :state="state"
       />
     </BFormGroup>
 

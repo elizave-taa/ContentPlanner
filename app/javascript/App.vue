@@ -1,14 +1,11 @@
 <template>
-  <AuthPage />
+  <div id="app">
+    <router-view></router-view>
+  </div>
 </template>
 
 <script>
-import AuthPage from './RegistrationPage.vue';
-
 export default {
-  name: "App",
-  components: {
-    AuthPage
-  }
-};
+  name: 'App'
+}
 </script>

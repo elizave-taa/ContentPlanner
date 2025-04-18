@@ -1,5 +1,6 @@
 <script>
 import {BButton, BForm, BFormGroup, BFormInput} from "bootstrap-vue-next";
+import { useRouter } from 'vue-router';
 
 export default {
   components: {BButton, BFormInput, BFormGroup, BForm},
@@ -11,6 +12,11 @@ export default {
       },
     }
   },
+  methods: {
+    goToLogin() {
+      this.$router.push('/projects');
+    }
+  }
 }
 </script>
 
@@ -44,9 +50,9 @@ export default {
           required
       ></BFormInput>
     </BFormGroup>
-    <BButton class="login-btn" type="submit" variant="primary">Войти</BButton>
+    <BButton @click.prevent="goToLogin" class="login-btn" type="button" variant="primary">Войти</BButton>
   </BForm>
-  <label class="registration"> Еще нет аккаунта? <u class="link">Регистрация</u> </label>
+  <label class="registration"> Еще нет аккаунта? <router-link class="link" to="registration"><u class="link">Регистрация</u></router-link></label>
 </template>
 
 <style scoped>
@@ -71,6 +77,10 @@ export default {
   text-align: left!important;
 }
 .registration {
+  color: #4a2c40;
+  font-weight: lighter;
+}
+.link {
   color: #4a2c40;
   font-weight: lighter;
 }

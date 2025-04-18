@@ -54,7 +54,7 @@
 .nav-item, .nav-dropdown {
   color: white;
   padding: 8px 12px;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 200;
   cursor: pointer;
   line-height: 15px;
