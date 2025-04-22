@@ -1,12 +1,16 @@
 <script>
 import GeneralNavBar from "./GeneralNavBar.vue";
 import ProjectCard from "./ProjectCard.vue";
-import { BFormCheckboxGroup } from "bootstrap-vue-next";
+import ProjectCreationModal from "./ProjectCreationModal.vue";
+import {BButton, BFormCheckboxGroup, BModal} from "bootstrap-vue-next";
 
 export default {
   components: {
+    BModal,
+    BButton,
     GeneralNavBar,
     ProjectCard,
+    ProjectCreationModal,
     BFormCheckboxGroup
   },
   data() {
@@ -23,9 +27,17 @@ export default {
         { item: 'instagram', name: 'Instagram' },
         { item: 'youtube', name: 'YouTube' },
         { item: 'yandex', name: 'Yandex' },
-      ]
+        { item: 'tiktok', name: 'Yandex' },
+      ],
+      selected3: [],
+      specialists: [
+        {item: '1', name: 'Специалист 1'},
+        {item: '2', name: 'Специалист 2'},
+      ],
+      showModal: false,
+      showCreationModal: false
     }
-  }
+  },
 }
 </script>
 
@@ -53,6 +65,19 @@ export default {
           stacked
           class="filter-checkboxes"
       ></BFormCheckboxGroup>
+      <h6 class="titles">Специалисты</h6>
+      <BFormCheckboxGroup
+          v-model="selected3"
+          :options="specialists"
+          value-field="item"
+          text-field="name"
+          stacked
+          class="filter-checkboxes"
+      ></BFormCheckboxGroup>
+
+        <BButton @click="showCreationModal = true" class="create-btn">Добавить проект</BButton>
+        <ProjectCreationModal v-model="showCreationModal" />
+
     </div>
     <div class="projects-panel">
       <ProjectCard></ProjectCard>
@@ -87,22 +112,35 @@ export default {
   width: 70%;
   flex-grow: 1;
 }
-
 .filter-checkboxes {
   color: #4a2c40;
   font-weight: 400;
   margin-bottom: 20px;
 }
-
 .titles {
   color: #4a2c40;
   font-weight: 400;
   margin-top: 15px;
   margin-bottom: 10px;
 }
-
 .filter {
   color: #4a2c40;
   margin-bottom: 20px;
 }
+.create-btn {
+  background-color: #4a2c40  !important;
+  padding: 0.75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  border-radius: 8px;
+  border: none;
+  transition: all 0.3s ease;
+  color: #ffffff !important;
+  margin-bottom: 20px;
+}
+.create-btn:hover {
+  background-color: rgb(129, 78, 109) !important;
+  transform: translateY(-2px);
+}
+
 </style>
