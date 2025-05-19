@@ -2,7 +2,7 @@
   <div class="global-header">
     <BContainer class="main-1">
       <div class="nav-item">
-        <span class="dropdown-text">Расписание</span>
+        <router-link class="dropdown-text" to="schedule">Расписание</router-link>
       </div>
       <BDropdown
           class="nav-dropdown"
