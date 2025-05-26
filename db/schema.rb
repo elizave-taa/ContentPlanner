@@ -10,10 +10,26 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_24_111642) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_20_222424) do
   create_table "projects", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "description"
+    t.integer "creator_id"
+    t.string "website_url"
+    t.string "map_url"
+    t.index ["creator_id"], name: "index_projects_on_creator_id"
   end
+
+  create_table "users", force: :cascade do |t|
+    t.string "username"
+    t.string "email"
+    t.string "phone_number"
+    t.string "password_digest"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  add_foreign_key "projects", "users", column: "creator_id"
 end

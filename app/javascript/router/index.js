@@ -24,6 +24,11 @@ const routes = [
         path: '/schedule',
         name: 'schedule',
         component: SchedulePage,
+    },
+    {
+        path: '/:pathMatch(.*)*',
+        name: 'NotFound',
+        redirect: '/projects'
     }
 ]
 
@@ -31,5 +36,17 @@ const router = createRouter({
     history: createWebHistory(),
     routes
 })
+
+// Navigation guard for authentication
+router.beforeEach((to, from, next) => {
+    const publicPages = ['auth', 'registration'];
+    const isPublic = publicPages.includes(to.name);
+    const user = localStorage.getItem('user');
+    if (!isPublic && !user) {
+        next({ name: 'auth' });
+    } else {
+        next();
+    }
+});
 
 export default router

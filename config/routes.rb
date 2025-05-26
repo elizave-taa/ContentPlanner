@@ -9,6 +9,11 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
+  # API endpoints for registration and authentication
+  post '/register', to: 'users#create'
+  post '/login', to: 'auth#create'
+  get '/logout', to: 'auth#destroy'
+
   # Defines the root path route ("/")
   root "home#index"
   get '*path', to: 'home#index', constraints: ->(req) { !req.xhr? && req.format.html? }
