@@ -3,6 +3,7 @@ import WelcomePage from '../AuthPage.vue'
 import RegistrationPage from '../RegistrationPage.vue'
 import ProjectsPage from '../ProjectsPage.vue'
 import SchedulePage from '../SchedulePage.vue'
+import ProjectPage from '../ProjectPage.vue'
 
 const routes = [
     {
@@ -24,6 +25,11 @@ const routes = [
         path: '/schedule',
         name: 'schedule',
         component: SchedulePage,
+    },
+    {
+        path: '/project',
+        name: 'project',
+        component: ProjectPage,
     },
     {
         path: '/:pathMatch(.*)*',
