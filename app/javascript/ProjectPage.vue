@@ -2,6 +2,7 @@
 import ContentPlan from './ContentPlan.vue'
 import ContentPlanItem from "./ContentPlanItem.vue";
 import GeneralNavBar from "./GeneralNavBar.vue";
+import ProjectInfo from "./ProjectInfo.vue";
 export default {
   name: "ProjectPage",
   components: {GeneralNavBar, ContentPlanItem, ContentPlan},
@@ -13,6 +14,7 @@ export default {
     <general-nav-bar></general-nav-bar>
     <div class="main-container">
       <content-plan></content-plan>
+      <pr
     </div>
   </div>
 </template>
