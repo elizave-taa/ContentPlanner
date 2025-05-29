@@ -2,7 +2,13 @@
 import GeneralNavBar from "./GeneralNavBar.vue";
 import ProjectCard from "./ProjectCard.vue";
 import ProjectCreationModal from "./ProjectCreationModal.vue";
-import {BButton, BFormCheckboxGroup, BModal} from "bootstrap-vue-next";
+import {
+  BButton,
+  BFormCheckboxGroup,
+  BModal,
+  BRow,
+  BCol
+} from "bootstrap-vue-next";
 
 export default {
   components: {
@@ -11,7 +17,9 @@ export default {
     GeneralNavBar,
     ProjectCard,
     ProjectCreationModal,
-    BFormCheckboxGroup
+    BFormCheckboxGroup,
+    BRow,
+    BCol
   },
   data() {
     return {
@@ -31,21 +39,54 @@ export default {
       ],
       selected3: [],
       specialists: [
-        {item: '1', name: 'Специалист 1'},
-        {item: '2', name: 'Специалист 2'},
+        { item: '1', name: 'Специалист 1' },
+        { item: '2', name: 'Специалист 2' },
       ],
       showModal: false,
-      showCreationModal: false
+      showCreationModal: false,
+      projects: [
+        {
+          id: 1,
+          title: 'Маркетинг в Telegram',
+          tags: ['Telegram', 'Instagram', 'YouTube', 'VK'],
+          date: '15.05.2025'
+        },
+        {
+          id: 2,
+          title: 'YouTube Кампания',
+          tags: ['YouTube', 'VK'],
+          date: '18.05.2025'
+        },
+        {
+          id: 3,
+          title: 'Запуск в Instagram',
+          tags: ['Instagram'],
+          date: '20.05.2025'
+        },
+        {
+          id: 4,
+          title: 'VK + Telegram Продвижение',
+          tags: ['VK', 'Telegram'],
+          date: '22.05.2025'
+        },
+        {
+          id: 5,
+          title: 'Полный медиа-пакет',
+          tags: ['Telegram', 'YouTube', 'VK', 'Instagram'],
+          date: '25.05.2025'
+        }
+      ]
     }
   },
 }
 </script>
 
 <template>
-  <GeneralNavBar></GeneralNavBar>
+  <GeneralNavBar />
   <div class="app-container">
     <div class="filter-panel">
       <h5 class="filter">Фильтры:</h5>
+
       <h6 class="titles">Статус проекта</h6>
       <BFormCheckboxGroup
           v-model="selected1"
@@ -54,7 +95,7 @@ export default {
           text-field="name"
           stacked
           class="filter-checkboxes"
-      ></BFormCheckboxGroup>
+      />
 
       <h6 class="titles">Соц. сети</h6>
       <BFormCheckboxGroup
@@ -64,7 +105,8 @@ export default {
           text-field="name"
           stacked
           class="filter-checkboxes"
-      ></BFormCheckboxGroup>
+      />
+
       <h6 class="titles">Специалисты</h6>
       <BFormCheckboxGroup
           v-model="selected3"
@@ -73,14 +115,30 @@ export default {
           text-field="name"
           stacked
           class="filter-checkboxes"
-      ></BFormCheckboxGroup>
+      />
 
-        <BButton @click="showCreationModal = true" class="create-btn">Добавить проект</BButton>
-        <ProjectCreationModal v-model="showCreationModal" />
-
+      <BButton @click="showCreationModal = true" class="create-btn">
+        Добавить проект
+      </BButton>
+      <ProjectCreationModal v-model="showCreationModal" />
     </div>
+
     <div class="projects-panel">
-      <ProjectCard></ProjectCard>
+      <BRow class="g-3">
+        <BCol
+            v-for="project in projects"
+            :key="project.id"
+            cols="12"
+            md="6"
+            lg="4"
+        >
+          <ProjectCard
+              :title="project.title"
+              :tags="project.tags"
+              :date="project.date"
+          />
+        </BCol>
+      </BRow>
     </div>
   </div>
 </template>
@@ -90,8 +148,8 @@ export default {
   background-color: #e3c3d4;
   min-height: 100vh;
   display: flex;
-  align-items: flex-start; /* Выравнивание по верху */
-  padding-bottom: 30px; /* Добавляем отступ снизу */
+  align-items: flex-start;
+  padding-bottom: 30px;
 }
 
 .filter-panel {
@@ -112,23 +170,27 @@ export default {
   width: 70%;
   flex-grow: 1;
 }
+
 .filter-checkboxes {
   color: #4a2c40;
   font-weight: 400;
   margin-bottom: 20px;
 }
+
 .titles {
   color: #4a2c40;
   font-weight: 400;
   margin-top: 15px;
   margin-bottom: 10px;
 }
+
 .filter {
   color: #4a2c40;
   margin-bottom: 20px;
 }
+
 .create-btn {
-  background-color: #4a2c40  !important;
+  background-color: #4a2c40 !important;
   padding: 0.75rem;
   font-size: 1rem;
   font-weight: 400;
@@ -138,9 +200,9 @@ export default {
   color: #ffffff !important;
   margin-bottom: 20px;
 }
+
 .create-btn:hover {
   background-color: rgb(129, 78, 109) !important;
   transform: translateY(-2px);
 }
-
 </style>

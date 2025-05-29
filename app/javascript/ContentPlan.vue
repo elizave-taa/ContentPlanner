@@ -197,9 +197,10 @@ const onDragEnd = () => {
   border: none !important;
   background: rgba(255, 255, 255, 0.5) !important;
   border-radius: 18px !important;
-  margin: 20px;
   padding: 10px;
-  width: 55%;
+  height: auto;
+  align-self: flex-start;
+  width: 95%;
 }
 .custom-tabs :deep(.nav-link) {
   color: #4a2c40 !important;

@@ -1,3 +1,47 @@
+<script>
+import { BContainer, BDropdown, BDropdownItem, BButton } from "bootstrap-vue-next"
+import Notifications from "./Notifications.vue"
+import { ref } from 'vue'
+
+export default {
+  components: {
+    Notifications,
+    BDropdown,
+    BDropdownItem,
+    BContainer,
+    BButton
+  },
+  setup() {
+    const notificationButton = ref(null)
+    const notifications = ref(null)
+    const unreadCount = ref(3)
+
+    const showNotifications = () => {
+      notifications.value.show()
+      unreadCount.value = 0 // Сбрасываем счетчик при открытии уведомлений
+    }
+
+    return {
+      notificationButton,
+      notifications,
+      unreadCount,
+      showNotifications
+    }
+  },
+  methods: {
+    showDropdown(refName) {
+      this.$refs[refName].show()
+    },
+    hideDropdown(refName) {
+      this.$refs[refName].hide()
+    },
+    logout() {
+      console.log('Выход из системы')
+    }
+  }
+}
+</script>
+
 <template>
   <div class="global-header">
     <BContainer class="main-1">
@@ -19,7 +63,6 @@
         <BDropdownItem>Проект 2</BDropdownItem>
       </BDropdown>
 
-      <!-- Специалисты (со стрелкой) -->
       <BDropdown
           class="nav-dropdown"
           ref="specialistsDropdown"
@@ -34,6 +77,22 @@
         <BDropdownItem>Специалист 1</BDropdownItem>
         <BDropdownItem>Специалист 2</BDropdownItem>
       </BDropdown>
+
+      <div class="notification-icon" ref="notificationButton" @click="showNotifications">
+        <img src="/images/notifications.svg" alt="Уведомления">
+        <span class="badge" v-if="unreadCount > 0">{{ unreadCount }}</span>
+      </div>
+
+      <Notifications :button-ref="notificationButton" ref="notifications" />
+
+      <!-- Кнопка выхода -->
+      <BButton
+          class="logout-btn"
+          variant="link"
+          @click="logout"
+      >
+        Выход
+      </BButton>
     </BContainer>
   </div>
 </template>
@@ -50,6 +109,7 @@
   align-items: center;
   width: 100%;
   margin: 0 auto;
+  position: relative;
 }
 .nav-item, .nav-dropdown {
   color: white;
@@ -107,20 +167,63 @@
 .nav-dropdown >>> .dropdown-item:hover {
   background-color: rgba(255, 255, 255, 0.1);
 }
-</style>
 
-<script>
-import {BContainer, BDropdown, BDropdownItem} from "bootstrap-vue-next";
-
-export default {
-  components: {BDropdown, BDropdownItem, BContainer},
-  methods: {
-    showDropdown(refName) {
-      this.$refs[refName].show();
-    },
-    hideDropdown(refName) {
-      this.$refs[refName].hide();
-    }
-  }
+.logout-btn {
+  color: white !important;
+  text-decoration: none;
+  margin-left: 20px;
+  padding: 8px 16px;
+  font-size: 15px;
+  font-weight: 200;
+  cursor: pointer;
+  background: none !important;
+  border: none !important;
 }
-</script>
+.logout-btn:hover {
+  text-decoration: underline;
+}
+
+.notification-icon {
+  position: relative;
+  margin-left: auto;
+  cursor: pointer;
+  padding: 8px 12px;
+}
+
+.badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background-color: #ff4757;
+  color: white;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: bold;
+}
+.notification-icon {
+  position: relative;
+  margin-left: auto;
+  cursor: pointer;
+  padding: 8px 12px;
+}
+.badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background-color: #ff4757;
+  color: white;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: bold;
+}
+</style>

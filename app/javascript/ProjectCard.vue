@@ -1,34 +1,58 @@
 <script setup>
-import {BBadge, BButton, BCard} from "bootstrap-vue-next";
+import { BBadge, BButton, BCard } from "bootstrap-vue-next";
+
+defineProps({
+  title: String,
+  tags: Array,
+  date: String
+})
+
+// Функция для определения Bootstrap variant
+const getVariant = (tag) => {
+  switch (tag.toLowerCase()) {
+    case 'tiktok':
+      return 'dark'
+    case 'vk':
+      return 'primary'
+    case 'youtube':
+      return 'danger'
+    case 'instagram':
+      return 'warning'
+    case 'telegram':
+      return 'info'
+    case 'yandex':
+      return 'warning'
+    default:
+      return 'secondary'
+  }
+}
 </script>
 
 <template>
-  <div class="card-wrapper">
-    <BCard
-        tag="article"
-        class="blur-card"
-    >
-      <div class="card-image-container">
-        <img
-            src="/images/illustration.png"
-            alt="Card image"
-            class="card-image"
-        >
-        <div class="image-gradient"></div>
-        <div class="card-title">Card Title</div>
-      </div>
-
-      <div class="card-body">
-        <div class="badges-container">
-          <BBadge variant="primary">Телеграм</BBadge>
-          <BBadge variant="secondary">Инстаграм</BBadge>
-          <BBadge variant="success">ВК</BBadge>
-          <BBadge variant="danger">YT</BBadge>
+  <router-link :to="{ name: 'project' }" class="card-link">
+    <div class="card-wrapper">
+      <BCard tag="article" class="blur-card">
+        <div class="card-image-container">
+          <img src="/images/illustration.png" alt="Card image" class="card-image" />
+          <div class="image-gradient"></div>
+          <div class="card-title">{{ title }}</div>
         </div>
-        <div class="publication-date">Публикация: дата</div>
-      </div>
-    </BCard>
-  </div>
+
+        <div class="card-body">
+          <div class="badges-container">
+            <BBadge
+                v-for="(tag, i) in tags"
+                :key="i"
+                :variant="getVariant(tag)"
+            >
+              {{ tag }}
+            </BBadge>
+          </div>
+          <div class="publication-date">Публикация: {{ date }}</div>
+        </div>
+      </BCard>
+    </div>
+  </router-link>
 </template>
 
 <style scoped>
@@ -51,9 +75,9 @@ import {BBadge, BButton, BCard} from "bootstrap-vue-next";
 }
 
 .blur-card {
-  border: none!important;
-  background: rgba(255, 255, 255, 0.5)!important;
-  border-radius: 18px!important;
+  border: none !important;
+  background: rgba(255, 255, 255, 0.5) !important;
+  border-radius: 18px !important;
   height: 100%;
 }
 
@@ -63,7 +87,12 @@ import {BBadge, BButton, BCard} from "bootstrap-vue-next";
   object-fit: cover;
   display: block;
 }
-
+.card-link {
+  text-decoration: none;
+  color: inherit;
+  display: inline-block;
+  width: 100%;
+}
 .image-gradient {
   position: absolute;
   bottom: 0;
@@ -78,8 +107,9 @@ import {BBadge, BButton, BCard} from "bootstrap-vue-next";
   bottom: 15px;
   left: 15px;
   color: white;
-  font-size: 30px;
+  font-size: 25px;
   font-weight: 500;
+  line-height: 25px;
   z-index: 2;
 }
 

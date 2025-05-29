@@ -1,26 +1,79 @@
 <script>
-import ContentPlan from './ContentPlan.vue'
-import ContentPlanItem from "./ContentPlanItem.vue";
-import GeneralNavBar from "./GeneralNavBar.vue";
-import ProjectInfo from "./ProjectInfo.vue";
-export default {
-  name: "ProjectPage",
-  components: {GeneralNavBar, ContentPlanItem, ContentPlan},
-};
+  import ContentPlan from './ContentPlan.vue'
+  import ContentPlanItem from "./ContentPlanItem.vue";
+  import GeneralNavBar from "./GeneralNavBar.vue";
+  import ProjectInfo from "./ProjectInfo.vue";
+  import ManageProject from "./ManageProject.vue";
+  import AIHelper from "./AIHelper.vue";
+
+  export default {
+    name: "ProjectPage",
+    components: {
+      AIHelper,
+      ManageProject,
+      GeneralNavBar,
+      ContentPlanItem,
+      ContentPlan,
+      ProjectInfo,
+    },
+    data() {
+      return {
+        project: {
+          name: 'Проект Красота',
+          url: 'https://example.com',
+          comments: 'Проект ориентирован на молодую аудиторию. Важно учесть стиль и вовлеченность.',
+          socialLinks: {
+            telegram: 'https://t.me/example',
+            instagram: '',
+            vk: 'https://vk.com/example',
+            youtube: 'https://youtube.com/example',
+            tiktok: '',
+            yandex: 'https://zen.yandex.ru/example'
+          },
+          photoMaterials: [
+            { title: 'Фотосессия с мероприятия', url: 'https://example.com/photo1' },
+            { title: 'Бэкстейдж', url: 'https://example.com/photo2' }
+          ],
+          mapLinks: [
+            { url: 'https://yandex.ru/maps/?z=10&ll=37.62,55.75' }
+          ],
+          designLinks: [],
+          references: [
+            { title: 'Аккаунт @creative', url: 'https://instagram.com/creative' }
+          ],
+        },
+        uploadedFiles: [
+          new File([""], "brief.pdf", { type: "application/pdf", size: 1024 * 1024 }),
+          new File([""], "logo.png", { type: "image/png", size: 204800 }),
+        ]
+      }
+    }
+  }
 </script>
 
 <template>
   <div class="page-wrapper">
-    <general-nav-bar></general-nav-bar>
+    <general-nav-bar />
+
     <div class="main-container">
-      <content-plan></content-plan>
-      <pr
+      <div class="column left-column">
+        <content-plan />
+        <a-i-helper />
+      </div>
+
+      <div class="column right-column">
+        <manage-project />
+        <project-info
+            :project="project"
+            :uploadedFiles="uploadedFiles"
+        />
+      </div>
     </div>
   </div>
 </template>
 
-<style scoped>
 
+<style scoped>
 .page-wrapper {
   display: flex;
   flex-direction: column;
@@ -29,17 +82,24 @@ export default {
 }
 
 .main-container {
-  flex: 1;
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  max-width: 1300px;
   width: 100%;
-  max-width: 1200px;
   margin: 0 auto;
+  padding: 30px;
 }
-</style>
 
-<style>
-html, body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 1;
+}
+
+.left-column,
+.right-column {
+  flex: 1;
 }
 </style>
