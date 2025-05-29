@@ -11,10 +11,11 @@
     <!-- Кнопка "Редактировать проект" -->
     <BButton
         class="action-btn"
-        @click="editProject"
+        @click="showEditModal = true"
     >
       Редактировать проект
     </BButton>
+    <EditProjectModal v-model="showEditModal"></EditProjectModal>
 
     <!-- Кнопка "В архив" -->
     <BButton
@@ -82,10 +83,12 @@
 
 <script>
 import { BButton, BModal } from 'bootstrap-vue-next'
+import EditProjectModal from "./EditProjectModal.vue";
 
 export default {
   name: 'ManageProject',
   components: {
+    EditProjectModal,
     BButton,
     BModal
   },
@@ -94,7 +97,8 @@ export default {
       showAssignModal: false,
       showDeleteModal: false,
       showArchiveModal: false,
-      uniqueCode: this.generateCode()
+      uniqueCode: this.generateCode(),
+      showEditModal: false,
     }
   },
   methods: {

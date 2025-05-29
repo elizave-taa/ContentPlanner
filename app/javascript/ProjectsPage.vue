@@ -7,11 +7,12 @@ import {
   BFormCheckboxGroup,
   BModal,
   BRow,
-  BCol
+  BCol, BFormCheckbox
 } from "bootstrap-vue-next";
 
 export default {
   components: {
+    BFormCheckbox,
     BModal,
     BButton,
     GeneralNavBar,
@@ -86,6 +87,11 @@ export default {
   <div class="app-container">
     <div class="filter-panel">
       <h5 class="filter">Фильтры:</h5>
+
+      <div class="d-inline-flex align-items-center">
+        <BFormCheckbox switch class="me-0"/>
+        <h6 class="titles d-inline archive">Архив</h6>
+      </div>
 
       <h6 class="titles">Статус проекта</h6>
       <BFormCheckboxGroup
@@ -205,4 +211,8 @@ export default {
   background-color: rgb(129, 78, 109) !important;
   transform: translateY(-2px);
 }
+.archive {
+  padding-bottom: 7px;
+}
+
 </style>
