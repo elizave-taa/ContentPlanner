@@ -31,7 +31,7 @@ export default {
       try {
         const response = await register(this.form);
         localStorage.setItem('user', JSON.stringify(response.user));
-        this.router.push('/projects');
+        this.router.push('/');
       } catch (error) {
         this.error = error.message;
       }

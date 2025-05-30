@@ -10,15 +10,61 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_20_222424) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_30_234545) do
+  create_table "project_design_links", force: :cascade do |t|
+    t.integer "project_id", null: false
+    t.string "url"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["project_id"], name: "index_project_design_links_on_project_id"
+  end
+
+  create_table "project_files", force: :cascade do |t|
+    t.integer "project_id", null: false
+    t.string "filename"
+    t.binary "data"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["project_id"], name: "index_project_files_on_project_id"
+  end
+
+  create_table "project_map_links", force: :cascade do |t|
+    t.integer "project_id", null: false
+    t.string "url"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["project_id"], name: "index_project_map_links_on_project_id"
+  end
+
+  create_table "project_photos", force: :cascade do |t|
+    t.integer "project_id", null: false
+    t.string "url"
+    t.string "title"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["project_id"], name: "index_project_photos_on_project_id"
+  end
+
+  create_table "project_reference_links", force: :cascade do |t|
+    t.integer "project_id", null: false
+    t.string "url"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["project_id"], name: "index_project_reference_links_on_project_id"
+  end
+
   create_table "projects", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "description"
     t.integer "creator_id"
-    t.string "website_url"
-    t.string "map_url"
+    t.string "telegram_url"
+    t.string "instagram_url"
+    t.string "vkontakte_url"
+    t.string "youtube_url"
+    t.string "tiktok_url"
+    t.string "yandex_zen_url"
     t.index ["creator_id"], name: "index_projects_on_creator_id"
   end
 
@@ -31,5 +77,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_20_222424) do
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "project_design_links", "projects"
+  add_foreign_key "project_files", "projects"
+  add_foreign_key "project_map_links", "projects"
+  add_foreign_key "project_photos", "projects"
+  add_foreign_key "project_reference_links", "projects"
   add_foreign_key "projects", "users", column: "creator_id"
 end
