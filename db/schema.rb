@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_30_234545) do
+ActiveRecord::Schema[8.0].define(version: 2025_05_31_125255) do
   create_table "project_design_links", force: :cascade do |t|
     t.integer "project_id", null: false
     t.string "url"
@@ -65,6 +65,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_30_234545) do
     t.string "youtube_url"
     t.string "tiktok_url"
     t.string "yandex_zen_url"
+    t.boolean "is_archived"
     t.index ["creator_id"], name: "index_projects_on_creator_id"
   end
 
