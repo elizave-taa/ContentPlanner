@@ -281,7 +281,6 @@ export default defineComponent({
           <DynamicLinksSection
               title="Материалы с фотографиями"
               v-model="project.photoMaterials"
-              with-titles
           />
 
           <DynamicLinksSection

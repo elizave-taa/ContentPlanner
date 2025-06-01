@@ -65,7 +65,7 @@
       <p v-else class="text-muted">Нет данных</p>
     </div>
 
-    <div class="mb-3">
+    <div class="mb-3" v-if="project.specialists?.length">
       <strong>Назначенные специалисты:</strong>
       <ul class="mb-0">
         <li v-for="(person, index) in project.specialists" :key="index">
@@ -74,10 +74,10 @@
       </ul>
     </div>
 
-    <div v-if="uploadedFiles?.length" class="mb-3">
+    <div v-if="project.files?.length" class="mb-3">
       <strong>Загруженные файлы:</strong>
       <ul>
-        <li v-for="(file, index) in uploadedFiles" :key="index">
+        <li v-for="(file, index) in project.files" :key="index">
           <a :href="getFileUrl(file)" target="_blank">{{ file.name }}</a>
           <span class="text-muted ms-2">({{ formatFileSize(file.size) }})</span>
         </li>
@@ -97,10 +97,6 @@ export default defineComponent({
     project: {
       type: Object,
       required: true,
-    },
-    uploadedFiles: {
-      type: Array,
-      default: () => [],
     },
   },
   data() {

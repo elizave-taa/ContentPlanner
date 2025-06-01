@@ -39,13 +39,9 @@
           ],
           designLinks: [],
           references: [
-            { title: 'Аккаунт @creative', url: 'https://instagram.com/creative' }
+            { url: 'https://instagram.com/creative' }
           ],
         },
-        uploadedFiles: [
-          new File([""], "brief.pdf", { type: "application/pdf", size: 1024 * 1024 }),
-          new File([""], "logo.png", { type: "image/png", size: 204800 }),
-        ]
       }
     },
     methods: {
@@ -74,10 +70,7 @@
 
       <div class="column right-column">
         <manage-project :project="project" @save-project="saveProject" @delete-project="deleteProject" @archive-project="archiveProject" />
-        <project-info
-            :project="project"
-            :uploadedFiles="uploadedFiles"
-        />
+        <project-info :project="project"/>
       </div>
     </div>
   </div>
