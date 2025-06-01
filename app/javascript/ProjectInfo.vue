@@ -38,8 +38,7 @@
       <strong>Социальные сети:</strong>
       <div class="d-flex flex-wrap gap-2 mt-1">
         <BBadge
-            v-for="(link, key) in project.socialLinks"
-            v-if="link"
+            v-for="(link, key) in socialLinks"
             :key="key"
             variant="info"
             class="text-truncate"
@@ -112,6 +111,11 @@ export default defineComponent({
     }
   },
   computed: {
+    socialLinks() {
+      return Object.fromEntries(
+        Object.entries(this.project.socialLinks || {}).filter(([_, value]) => value)
+      );
+    },
     hasSocialLinks() {
       return Object.values(this.project.socialLinks || {}).some(Boolean)
     },

@@ -15,7 +15,7 @@
     >
       Редактировать проект
     </BButton>
-    <EditProjectModal v-model="showEditModal"></EditProjectModal>
+    <EditProjectModal v-model="showEditModal" :projectToEdit="project" @save-project="saveProject" @delete-project="deleteProject"></EditProjectModal>
 
     <!-- Кнопка "В архив" -->
     <BButton
@@ -41,8 +41,7 @@
         centered
     >
       <template #footer>
-        <BButton @click="showAssignModal = false">Копировать код</BButton>
-        <BButton @click="deleteProject">Закрыть</BButton>
+        <BButton @click="showAssignModal = false">Закрыть</BButton>
       </template>
 
       <div class="modal-content">
@@ -92,6 +91,12 @@ export default {
     BButton,
     BModal
   },
+  props: {
+    project: {
+      type: Object,
+      required: true,
+    },
+  },
   data() {
     return {
       showAssignModal: false,
@@ -114,24 +119,24 @@ export default {
         autoHideDelay: 3000
       })
     },
-    editProject() {
-      // Логика редактирования проекта
-      this.$emit('edit-project')
+    saveProject(project) {
+      this.$emit('save-project', project)
     },
     deleteProject() {
       // Логика удаления проекта
       this.showDeleteModal = false
-      this.$emit('project-deleted')
+      this.$emit('delete-project')
       this.$bvToast.toast('Проект успешно удален', {
         title: 'Успешно',
         variant: 'success',
         autoHideDelay: 5000
       })
+
     },
     archiveProject() {
       // Логика архивации проекта
       this.showArchiveModal = false
-      this.$emit('project-archived')
+      this.$emit('archive-project')
       this.$bvToast.toast('Проект перемещен в архив', {
         title: 'Успешно',
         variant: 'success',

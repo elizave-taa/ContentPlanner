@@ -1,7 +1,7 @@
 <script>
 import GeneralNavBar from "./GeneralNavBar.vue";
 import ProjectCard from "./ProjectCard.vue";
-import ProjectCreationModal from "./ProjectCreationModal.vue";
+import EditProjectModal from "./EditProjectModal.vue";
 import {
   BButton,
   BFormCheckboxGroup,
@@ -17,7 +17,7 @@ export default {
     BButton,
     GeneralNavBar,
     ProjectCard,
-    ProjectCreationModal,
+    EditProjectModal,
     BFormCheckboxGroup,
     BRow,
     BCol
@@ -126,7 +126,7 @@ export default {
       <BButton @click="showCreationModal = true" class="create-btn">
         Добавить проект
       </BButton>
-      <ProjectCreationModal v-model="showCreationModal" />
+      <EditProjectModal v-model="showCreationModal" />
     </div>
 
     <div class="projects-panel">

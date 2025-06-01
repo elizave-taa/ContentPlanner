@@ -22,13 +22,16 @@ export default defineComponent({
     projectToEdit: {
       type: Object,
       default: null
+    },
+    modelValue: {
+      type: Boolean,
+      required: true,
     }
   },
   data() {
     return {
-      showModal: false,
       uploadedFiles: [],
-      project: this.getDefaultProject(),
+      project: {},
       socialOptions: [
         { text: 'Телеграм', value: 'telegram' },
         { text: 'Инстаграм', value: 'instagram' },
@@ -37,36 +40,58 @@ export default defineComponent({
         { text: 'Tik Tok', value: 'tiktok'},
         { text: 'Яндекс Дзен', value: 'yandex'}
       ],
+      socialNetworks: [],
     }
   },
   computed: {
     selectedSocialNetworks() {
       return this.socialOptions.filter(option =>
-          this.project.socialNetworks?.includes(option.value)
+          this.socialNetworks?.includes(option.value)
       );
+    },
+    showModal: {
+      get() {
+        return this.modelValue;
+      },
+      set(value) {
+        this.$emit('update:modelValue', value);
+      }
     }
   },
   created() {
     // Автоматически загружаем тестовый проект при создании компонента
-    if (!this.projectToEdit) {
-      this.loadTestProject();
-    }
+    // if (!this.projectToEdit) {
+    //   this.loadTestProject();
+    // }
   },
   watch: {
     projectToEdit: {
       immediate: true,
       handler(newVal) {
         if (newVal) {
-          this.project = JSON.parse(JSON.stringify(newVal));
-          if (newVal.files && newVal.files.length) {
-            this.uploadedFiles = [...newVal.files];
-          }
-          this.showModal = true;
+          this.resetProject();
         }
+      }
+    },
+    socialNetworks: {
+      immediate: true,
+      handler(newVal) {
+        this.project.socialLinks = newVal.reduce((acc, network) => {
+          acc[network] = this.project.socialLinks[network] || '';
+          return acc;
+        }, {});
       }
     }
   },
   methods: {
+
+    resetProject() {
+      this.project = JSON.parse(JSON.stringify(this.projectToEdit));
+      if (this.projectToEdit.files && this.projectToEdit.files.length) {
+        this.uploadedFiles = [...this.projectToEdit.files];
+      }
+      this.socialNetworks = this.socialOptions.filter(option => this.project.socialLinks[option.value]).map(option => option.value);
+    },
     getDefaultProject() {
       return {
         name: '',
@@ -158,18 +183,16 @@ export default defineComponent({
     },
     saveProject() {
       this.project.files = this.uploadedFiles;
-      this.$emit('project-saved', this.project);
-      this.closeModal();
+      this.$emit('save-project', this.project);
+      this.showModal = false;
     },
     deleteProject() {
-      this.$emit('project-deleted', this.project.id);
-      this.closeModal();
+      this.$emit('delete-project');
+      this.showModal = false;
     },
     closeModal() {
       this.showModal = false;
-      this.project = this.getDefaultProject();
-      this.uploadedFiles = [];
-      this.$emit('modal-closed');
+      this.resetProject();
     }
   }
 })
@@ -232,7 +255,7 @@ export default defineComponent({
             </template>
 
             <BFormCheckboxGroup
-                v-model="project.socialNetworks"
+                v-model="socialNetworks"
                 :options="socialOptions"
                 stacked
                 value-field="value"
@@ -310,7 +333,7 @@ export default defineComponent({
       </div>
     </div>
 
-    <template #modal-footer>
+    <template #footer>
       <div class="w-100 d-flex justify-content-between">
         <BButton
             v-if="projectToEdit"

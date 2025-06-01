@@ -35,7 +35,11 @@ import { BFormGroup, BFormInput, BButton } from 'bootstrap-vue-next'
 export default {
   components: { BButton, BFormInput, BFormGroup },
   props: {
-    modelValue: Array,
+    modelValue: {
+      type: Array,
+      required: true,
+      default: () => []
+    },
     title: String,
     withTitles: Boolean
   },

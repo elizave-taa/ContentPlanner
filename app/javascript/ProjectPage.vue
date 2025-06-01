@@ -47,6 +47,17 @@
           new File([""], "logo.png", { type: "image/png", size: 204800 }),
         ]
       }
+    },
+    methods: {
+      saveProject(project) {
+        this.project = project
+      },
+      deleteProject() {
+        console.log("deleteProject not implemented")
+      },
+      archiveProject() {
+        console.log("archiveProject not implemented")
+      }
     }
   }
 </script>
@@ -62,7 +73,7 @@
       </div>
 
       <div class="column right-column">
-        <manage-project />
+        <manage-project :project="project" @save-project="saveProject" @delete-project="deleteProject" @archive-project="archiveProject" />
         <project-info
             :project="project"
             :uploadedFiles="uploadedFiles"
