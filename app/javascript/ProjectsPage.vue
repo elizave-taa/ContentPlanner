@@ -50,21 +50,18 @@ export default {
     }
   },
   async created() {
-    let projects = await fetchProjects();
-    console.log(projects)
-    this.projects = projects.map(project => ({
-      // ...project,
-      title: project.name,
-      tags: Object.keys(project.socialLinks).filter(key => project.socialLinks[key]),
-      date: project.created_at
-    }));
+    this.projects = await fetchProjects();
+    console.log(this.projects)
   },
   methods: {
+    getTags(project) {
+      return Object.keys(project.socialLinks).filter(key => project.socialLinks[key]);
+    },
     async saveProject(projectData) {
+      this.showCreationModal = false;
       try {
         const createdProject = await createProject(projectData);
         this.projects.push(createdProject);
-        this.showCreationModal = false;
         console.log('Project created successfully:', createdProject);
       } catch (error) {
         console.error('Error creating project:', error);
@@ -131,9 +128,10 @@ export default {
             lg="4"
         >
           <ProjectCard
-              :title="project.title"
-              :tags="project.tags"
-              :date="project.date"
+              :title="project.name"
+              :tags="getTags(project)"
+              :date="project.created_at"
+              :id="project.id"
           />
         </BCol>
       </BRow>

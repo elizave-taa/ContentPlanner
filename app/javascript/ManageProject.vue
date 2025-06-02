@@ -126,22 +126,22 @@ export default {
       // Логика удаления проекта
       this.showDeleteModal = false
       this.$emit('delete-project')
-      this.$bvToast.toast('Проект успешно удален', {
-        title: 'Успешно',
-        variant: 'success',
-        autoHideDelay: 5000
-      })
+      // this.$bvToast.toast('Проект успешно удален', {
+      //   title: 'Успешно',
+      //   variant: 'success',
+      //   autoHideDelay: 5000
+      // })
 
     },
     archiveProject() {
       // Логика архивации проекта
       this.showArchiveModal = false
       this.$emit('archive-project')
-      this.$bvToast.toast('Проект перемещен в архив', {
-        title: 'Успешно',
-        variant: 'success',
-        autoHideDelay: 5000
-      })
+      // this.$bvToast.toast('Проект перемещен в архив', {
+      //   title: 'Успешно',
+      //   variant: 'success',
+      //   autoHideDelay: 5000
+      // })
     }
   }
 }

@@ -27,9 +27,10 @@ const routes = [
         component: SchedulePage,
     },
     {
-        path: '/project',
+        path: '/project/:id',
         name: 'project',
         component: ProjectPage,
+        props: true
     },
     {
         path: '/:pathMatch(.*)*',

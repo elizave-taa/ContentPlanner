@@ -5,7 +5,11 @@ Rails.application.routes.draw do
   namespace :api do
     post '/register', to: 'users#create'
     post '/login', to: 'auth#create'
-    resources :projects, only: [:create, :update, :index, :show, :destroy]
+    resources :projects, only: [:create, :update, :index, :show, :destroy] do
+      member do
+        patch :archive
+      end
+    end
   end
 
   get '/logout', to: 'api/auth#destroy'

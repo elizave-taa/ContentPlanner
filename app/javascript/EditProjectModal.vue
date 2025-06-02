@@ -21,7 +21,7 @@ export default defineComponent({
   props: {
     projectToEdit: {
       type: Object,
-      default: null
+      default: {}
     },
     modelValue: {
       type: Boolean,
@@ -48,6 +48,9 @@ export default defineComponent({
       return this.socialOptions.filter(option =>
           this.socialNetworks?.includes(option.value)
       );
+    },
+    files() {
+      return this.uploadedFiles?.filter(file => !file._destroy) || [];
     },
     showModal: {
       get() {
@@ -87,10 +90,10 @@ export default defineComponent({
 
     resetProject() {
       this.project = JSON.parse(JSON.stringify(this.projectToEdit));
-      if (this.projectToEdit.files && this.projectToEdit.files.length) {
+      if (this.projectToEdit?.files && this.projectToEdit?.files.length) {
         this.uploadedFiles = [...this.projectToEdit.files];
       }
-      this.socialNetworks = this.socialOptions.filter(option => this.project.socialLinks[option.value]).map(option => option.value);
+      this.socialNetworks = this.socialOptions.filter(option => this.project?.socialLinks?.[option.value]).map(option => option.value);
     },
     getDefaultProject() {
       return {
@@ -155,11 +158,14 @@ export default defineComponent({
       return name;
     },
     handleFileUpload(event) {
-      const newFiles = Array.from(event.target.files);
+      const newFiles = Array.from(event.target.files).map(file => {
+        return {
+          name: file.name,
+          data: file,
+        }
+      });
       this.uploadedFiles = [...this.uploadedFiles, ...newFiles];
-      const dataTransfer = new DataTransfer();
-      this.uploadedFiles.forEach(file => dataTransfer.items.add(file));
-      this.project.files = dataTransfer.files;
+      this.project.files = this.uploadedFiles;
     },
     formatFileNames(files) {
       return files.length ? `${files.length} файлов выбрано` : 'Выберите файлы'
@@ -176,10 +182,12 @@ export default defineComponent({
       window.open(fileURL, '_blank')
     },
     removeFile(index) {
-      this.uploadedFiles.splice(index, 1)
-      const dataTransfer = new DataTransfer()
-      this.uploadedFiles.forEach(file => dataTransfer.items.add(file))
-      this.project.files = dataTransfer.files
+      if (this.uploadedFiles[index].id) {
+        this.uploadedFiles[index]._destroy = true;
+      } else {
+        this.uploadedFiles.splice(index, 1);
+      }
+      this.project.files = this.uploadedFiles;
     },
     saveProject() {
       this.project.files = this.uploadedFiles;
@@ -202,7 +210,7 @@ export default defineComponent({
 <template>
   <BModal
       v-model="showModal"
-      :title="projectToEdit ? 'Редактирование проекта' : 'Создание проекта'"
+      :title="projectToEdit?.id ? 'Редактирование проекта' : 'Создание проекта'"
       size="xl"
       modal-class="custom-modal"
       header-class="custom-modal-header"
@@ -234,7 +242,18 @@ export default defineComponent({
             <BFormInput id="site-url" v-model="project.url" required />
           </BFormGroup>
 
-          <BFormGroup label="Дополнительные комментарии:" label-for="project-comments">
+          <BFormGroup>
+            <template #label>
+              <span class="required-field-label">
+                Дополнительные комментарии
+                <img
+                    src="/images/necessarily.png"
+                    alt="Обязательное поле"
+                    class="required-icon"
+                    title="Обязательное поле для заполнения"
+                >
+              </span>
+            </template>
             <BFormTextarea
                 id="project-comments"
                 v-model="project.comments"
@@ -309,15 +328,15 @@ export default defineComponent({
                 class="mb-3"
             />
 
-            <div v-if="uploadedFiles.length > 0" class="file-preview-container">
+            <div v-if="uploadedFiles?.length > 0" class="file-preview-container">
               <div class="file-grid">
-                <div v-for="(file, index) in uploadedFiles" :key="index" class="file-item">
-                  <div class="file-icon" @click="openFile(file)">
+                <div v-for="(file, index) in uploadedFiles" :key="index" class="file-item" :style="file._destroy ? 'display: none;' : ''">
+                  <div class="file-icon" @click="openFile(file.data)">
                     <BIconPaperclip class="clip-icon"/>
                   </div>
                   <div class="file-info">
                     <span class="file-name" :title="file.name">{{ truncateFileName(file.name) }}</span>
-                    <span class="file-size">{{ formatFileSize(file.size) }}</span>
+                    <span class="file-size">{{ formatFileSize(file.data.size) }}</span>
                   </div>
                   <BButton
                       @click="removeFile(index)"
@@ -335,28 +354,29 @@ export default defineComponent({
     </div>
 
     <template #footer>
-      <div class="w-100 d-flex justify-content-between">
-        <BButton
-            v-if="projectToEdit"
+      <div class="w-100 d-flex justify-content-end">
+        <!-- <BButton
+            v-if="projectToEdit?.id"
             variant="danger"
             @click="deleteProject"
         >
           Удалить проект
         </BButton>
-        <div></div>
+        <div></div> -->
         <div>
           <BButton
               variant="secondary"
               @click="closeModal"
-              class="mr-2"
+              class="mr-2 me-2"
           >
             Отмена
           </BButton>
           <BButton
               variant="primary"
+              :disabled="!project.name || !project.comments"
               @click="saveProject"
           >
-            {{ projectToEdit ? 'Сохранить изменения' : 'Создать проект' }}
+            {{ projectToEdit?.id ? 'Сохранить изменения' : 'Создать проект' }}
           </BButton>
         </div>
       </div>

@@ -58,7 +58,7 @@
     <div v-for="(section, key) in sections" :key="key" class="mb-3">
       <strong>{{ section.title }}:</strong>
       <ul v-if="project[key]?.length" class="mb-0">
-        <li v-for="(item, index) in project[key]" :key="index">
+        <li v-for="(item, index) in project[key]" :key="index" :style="item._destroy ? 'display: none;' : ''">
           <a :href="item.url" target="_blank">{{ item.title || item.url }}</a>
         </li>
       </ul>
@@ -77,9 +77,9 @@
     <div v-if="project.files?.length" class="mb-3">
       <strong>Загруженные файлы:</strong>
       <ul>
-        <li v-for="(file, index) in project.files" :key="index">
-          <a :href="getFileUrl(file)" target="_blank">{{ file.name }}</a>
-          <span class="text-muted ms-2">({{ formatFileSize(file.size) }})</span>
+        <li v-for="(file, index) in project.files" :key="index" :style="file._destroy ? 'display: none;' : ''">
+          <a :href="getFileUrl(file.data)" target="_blank">{{ file.name }}</a>
+          <span class="text-muted ms-2">({{ formatFileSize(file.data.size) }})</span>
         </li>
       </ul>
     </div>

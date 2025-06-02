@@ -1,6 +1,6 @@
 <template>
   <BFormGroup :label="title">
-    <div v-for="(link, index) in modelValue" :key="index" class="link-item mb-3">
+    <div v-for="(link, index) in modelValue" :key="index" class="link-item mb-3" :style="link._destroy ? 'display: none;' : ''">
       <div class="input-group">
         <BFormInput
             v-if="withTitles"
@@ -50,7 +50,11 @@ export default {
     },
     removeLink(index) {
       const links = [...this.modelValue]
-      links.splice(index, 1)
+      if (links[index].id) {
+        links[index]._destroy = true;
+      } else {
+        links.splice(index, 1);
+      }
       this.$emit('update:modelValue', links)
     }
   }

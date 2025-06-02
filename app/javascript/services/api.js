@@ -77,7 +77,7 @@ export const updateProject = async (id, projectData) => {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'same-origin',
-    body: JSON.stringify({ project: projectData })
+    body: JSON.stringify({ project: await transformProjectToApi(projectData) })
   });
   if (!response.ok) throw new Error('Failed to update project');
   return transformProjectToFrontend(await response.json());
@@ -91,6 +91,17 @@ export const deleteProject = async (id) => {
   if (!response.ok) throw new Error('Failed to delete project');
 };
 
+export const archiveProject = async (id, isArchived) => {
+  const response = await fetch(`/api/projects/${id}/archive`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'same-origin',
+    body: JSON.stringify({ is_archived: isArchived })
+  });
+  if (!response.ok) throw new Error('Failed to archive project');
+  return transformProjectToFrontend(await response.json());
+};
+
 function encodeFileToBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -102,7 +113,7 @@ function encodeFileToBase64(file) {
 
 function transformProjectToFrontend(project) {
   return {
-    name: project.name,
+    ...project,
     comments: project.description,
     socialLinks: {
       telegram: project.telegram_url,
@@ -113,33 +124,28 @@ function transformProjectToFrontend(project) {
       tiktok: project.tiktok_url,
       yandex: project.yandex_zen_url
     },
-    photoMaterials: (project.project_photos || []).map(photo => ({
-      url: photo.url,
-      title: photo.title || ''
-    })),
-    mapLinks: (project.project_map_links || []).map(link => ({
-      url: link.url
-    })),
-    designLinks: (project.project_design_links || []).map(link => ({
-      url: link.url
-    })),
-    references: (project.project_reference_links || []).map(link => ({
-      url: link.url
-    })),
+    photoMaterials: (project.project_photos || []),
+    mapLinks: (project.project_map_links || []),
+    designLinks: (project.project_design_links || []),
+    references: (project.project_reference_links || []),
     files: (project.project_files || []).map(file => {
       const blob = new Blob([atob(file.data)]);
-      return new File([blob], file.filename);
+      return {id: file.id, name: file.filename, data: new File([blob], file.filename)};
     })
   };
 }
 
 export const transformProjectToApi = async (project) => {
+  console.log('transformProjectToApi', project.files)
   const encodedFiles = await Promise.all((project.files || []).map(async file => ({
+    id: file.id,
     filename: file.name,
-    data: await encodeFileToBase64(file)
+    data: await encodeFileToBase64(file.data),
+    _destroy: file._destroy
   })));
 
   return {
+    ...project,
     name: project.name,
     description: project.comments || '',
     telegram_url: project.socialLinks.telegram || '',
@@ -148,19 +154,10 @@ export const transformProjectToApi = async (project) => {
     youtube_url: project.socialLinks.youtube || '',
     tiktok_url: project.socialLinks.tiktok || '',
     yandex_zen_url: project.socialLinks.yandex || '',
-    project_photos_attributes: (project.photoMaterials || []).map(photo => ({
-      url: photo.url,
-      title: photo.title || ''
-    })),
-    project_map_links_attributes: (project.mapLinks || []).map(link => ({
-      url: link.url
-    })),
-    project_design_links_attributes: (project.designLinks || []).map(link => ({
-      url: link.url
-    })),
-    project_reference_links_attributes: (project.references || []).map(link => ({
-      url: link.url
-    })),
+    project_photos_attributes: (project.photoMaterials || []),
+    project_map_links_attributes: (project.mapLinks || []),
+    project_design_links_attributes: (project.designLinks || []),
+    project_reference_links_attributes: (project.references || []),
     project_files_attributes: encodedFiles
   };
 };

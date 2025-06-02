@@ -5,6 +5,7 @@
   import ProjectInfo from "./ProjectInfo.vue";
   import ManageProject from "./ManageProject.vue";
   import AIHelper from "./AIHelper.vue";
+  import { archiveProject, deleteProject, fetchProject, updateProject } from './services/api';
 
   export default {
     name: "ProjectPage",
@@ -16,43 +17,65 @@
       ContentPlan,
       ProjectInfo,
     },
+    props: {
+      id: {
+        type: String,
+        required: true
+      }
+    },
     data() {
       return {
         project: {
-          name: 'Проект Красота',
-          url: 'https://example.com',
-          comments: 'Проект ориентирован на молодую аудиторию. Важно учесть стиль и вовлеченность.',
-          socialLinks: {
-            telegram: 'https://t.me/example',
-            instagram: '',
-            vk: 'https://vk.com/example',
-            youtube: 'https://youtube.com/example',
-            tiktok: '',
-            yandex: 'https://zen.yandex.ru/example'
-          },
-          photoMaterials: [
-            { title: 'Фотосессия с мероприятия', url: 'https://example.com/photo1' },
-            { title: 'Бэкстейдж', url: 'https://example.com/photo2' }
-          ],
-          mapLinks: [
-            { url: 'https://yandex.ru/maps/?z=10&ll=37.62,55.75' }
-          ],
-          designLinks: [],
-          references: [
-            { url: 'https://instagram.com/creative' }
-          ],
+          // name: 'Проект Красота',
+          // url: 'https://example.com',
+          // comments: 'Проект ориентирован на молодую аудиторию. Важно учесть стиль и вовлеченность.',
+          // socialLinks: {
+          //   telegram: 'https://t.me/example',
+          //   instagram: '',
+          //   vk: 'https://vk.com/example',
+          //   youtube: 'https://youtube.com/example',
+          //   tiktok: '',
+          //   yandex: 'https://zen.yandex.ru/example'
+          // },
+          // photoMaterials: [
+          //   { title: 'Фотосессия с мероприятия', url: 'https://example.com/photo1' },
+          //   { title: 'Бэкстейдж', url: 'https://example.com/photo2' }
+          // ],
+          // mapLinks: [
+          //   { url: 'https://yandex.ru/maps/?z=10&ll=37.62,55.75' }
+          // ],
+          // designLinks: [],
+          // references: [
+          //   { url: 'https://instagram.com/creative' }
+          // ],
         },
       }
+    },
+    async created() {
+      this.project = await fetchProject(this.id);
     },
     methods: {
       saveProject(project) {
         this.project = project
+        updateProject(this.id, project)
       },
-      deleteProject() {
-        console.log("deleteProject not implemented")
+      async deleteProject() {
+        try {
+          await deleteProject(this.id);
+          alert('Проект удален');
+          this.$router.push('/projects');
+        } catch (error) {
+          alert('Ошибка при удалении проекта');
+        }
       },
-      archiveProject() {
-        console.log("archiveProject not implemented")
+      async archiveProject() {
+        try {
+          this.project = await archiveProject(this.id, true);
+          alert('Проект перемещен в архив');
+          this.$router.push('/projects');
+        } catch (error) {
+          alert('Ошибка при перемещении в архив');
+        }
       }
     }
   }

@@ -4,7 +4,8 @@ import { BBadge, BButton, BCard } from "bootstrap-vue-next";
 defineProps({
   title: String,
   tags: Array,
-  date: String
+  date: String,
+  id: Number,
 })
 
 // Функция для определения Bootstrap variant
@@ -29,7 +30,7 @@ const getVariant = (tag) => {
 </script>
 
 <template>
-  <router-link :to="{ name: 'project' }" class="card-link">
+  <router-link :to="{ name: 'project', params: { id: id } }" class="card-link">
     <div class="card-wrapper">
       <BCard tag="article" class="blur-card">
         <div class="card-image-container">

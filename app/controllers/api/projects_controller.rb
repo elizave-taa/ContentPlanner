@@ -1,6 +1,6 @@
 module Api
   class ProjectsController < ApplicationController
-    skip_before_action :verify_authenticity_token, only: [:create, :update, :destroy]
+    skip_before_action :verify_authenticity_token, only: [:create, :update, :destroy, :archive]
 
     # POST /api/projects
     def create
@@ -57,6 +57,22 @@ module Api
       @project = Project.find(params[:id])
       @project.destroy
       head :no_content
+    end
+
+    # PATCH /api/projects/:id/archive
+    def archive
+      @project = Project.find(params[:id])
+      if @project.update(is_archived: params[:is_archived])
+        render json: @project, include: [
+          :project_photos,
+          :project_map_links,
+          :project_design_links,
+          :project_reference_links,
+          :project_files
+        ], status: :ok
+      else
+        render json: @project.errors, status: :unprocessable_entity
+      end
     end
 
     private
