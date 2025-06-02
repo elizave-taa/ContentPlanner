@@ -184,6 +184,7 @@ export default defineComponent({
     saveProject() {
       this.project.files = this.uploadedFiles;
       this.$emit('save-project', this.project);
+      this.resetProject();
       this.showModal = false;
     },
     deleteProject() {
@@ -281,6 +282,7 @@ export default defineComponent({
           <DynamicLinksSection
               title="Материалы с фотографиями"
               v-model="project.photoMaterials"
+              :with-titles="true"
           />
 
           <DynamicLinksSection

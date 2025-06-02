@@ -6,6 +6,7 @@ module Api
     def create
       user = User.find_by(email: params[:email])
       if user&.authenticate(params[:password])
+        Rails.logger.debug "User authenticated: #{user.id}"
         session[:user_id] = user.id
         render json: { user: user.slice(:id, :username, :email, :phone_number) }, status: :ok
       else

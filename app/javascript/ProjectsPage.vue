@@ -9,6 +9,7 @@ import {
   BRow,
   BCol, BFormCheckbox
 } from "bootstrap-vue-next";
+import { createProject, fetchProjects } from './services/api';
 
 export default {
   components: {
@@ -45,40 +46,31 @@ export default {
       ],
       showModal: false,
       showCreationModal: false,
-      projects: [
-        {
-          id: 1,
-          title: 'Маркетинг в Telegram',
-          tags: ['Telegram', 'Instagram', 'YouTube', 'VK'],
-          date: '15.05.2025'
-        },
-        {
-          id: 2,
-          title: 'YouTube Кампания',
-          tags: ['YouTube', 'VK'],
-          date: '18.05.2025'
-        },
-        {
-          id: 3,
-          title: 'Запуск в Instagram',
-          tags: ['Instagram'],
-          date: '20.05.2025'
-        },
-        {
-          id: 4,
-          title: 'VK + Telegram Продвижение',
-          tags: ['VK', 'Telegram'],
-          date: '22.05.2025'
-        },
-        {
-          id: 5,
-          title: 'Полный медиа-пакет',
-          tags: ['Telegram', 'YouTube', 'VK', 'Instagram'],
-          date: '25.05.2025'
-        }
-      ]
+      projects: []
     }
   },
+  async created() {
+    let projects = await fetchProjects();
+    console.log(projects)
+    this.projects = projects.map(project => ({
+      // ...project,
+      title: project.name,
+      tags: Object.keys(project.socialLinks).filter(key => project.socialLinks[key]),
+      date: project.created_at
+    }));
+  },
+  methods: {
+    async saveProject(projectData) {
+      try {
+        const createdProject = await createProject(projectData);
+        this.projects.push(createdProject);
+        this.showCreationModal = false;
+        console.log('Project created successfully:', createdProject);
+      } catch (error) {
+        console.error('Error creating project:', error);
+      }
+    }
+  }
 }
 </script>
 
@@ -126,7 +118,7 @@ export default {
       <BButton @click="showCreationModal = true" class="create-btn">
         Добавить проект
       </BButton>
-      <EditProjectModal v-model="showCreationModal" />
+      <EditProjectModal v-model="showCreationModal" @save-project="saveProject" />
     </div>
 
     <div class="projects-panel">
