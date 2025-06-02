@@ -4,6 +4,7 @@
     <BButton
         class="action-btn"
         @click="showAssignModal = true"
+        :disabled="project.is_archived"
     >
       Назначить сотрудника
     </BButton>
@@ -12,6 +13,7 @@
     <BButton
         class="action-btn"
         @click="showEditModal = true"
+        :disabled="project.is_archived"
     >
       Редактировать проект
     </BButton>
@@ -21,8 +23,16 @@
     <BButton
         class="action-btn"
         @click="showArchiveModal = true"
+        v-if="!project.is_archived"
     >
       В архив
+    </BButton>
+
+    <BButton
+        class="action-btn"
+        v-if="project.is_archived"
+    >
+      Восстановить
     </BButton>
 
     <!-- Кнопка "Удалить проект" -->
@@ -30,7 +40,7 @@
         class="action-btn remove"
         @click="showDeleteModal = true"
     >
-      Удалить проект
+      Удалить
     </BButton>
 
     <!-- Модальное окно назначения сотрудника -->

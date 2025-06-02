@@ -26,28 +26,7 @@
     data() {
       return {
         project: {
-          // name: 'Проект Красота',
-          // url: 'https://example.com',
-          // comments: 'Проект ориентирован на молодую аудиторию. Важно учесть стиль и вовлеченность.',
-          // socialLinks: {
-          //   telegram: 'https://t.me/example',
-          //   instagram: '',
-          //   vk: 'https://vk.com/example',
-          //   youtube: 'https://youtube.com/example',
-          //   tiktok: '',
-          //   yandex: 'https://zen.yandex.ru/example'
-          // },
-          // photoMaterials: [
-          //   { title: 'Фотосессия с мероприятия', url: 'https://example.com/photo1' },
-          //   { title: 'Бэкстейдж', url: 'https://example.com/photo2' }
-          // ],
-          // mapLinks: [
-          //   { url: 'https://yandex.ru/maps/?z=10&ll=37.62,55.75' }
-          // ],
-          // designLinks: [],
-          // references: [
-          //   { url: 'https://instagram.com/creative' }
-          // ],
+          
         },
       }
     },
