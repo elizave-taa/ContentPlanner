@@ -2,6 +2,7 @@
 import GeneralNavBar from "./GeneralNavBar.vue";
 import ProjectCard from "./ProjectCard.vue";
 import EditProjectModal from "./EditProjectModal.vue";
+import AddExistingProject from "./AddExistingProject.vue";
 import {
   BButton,
   BFormCheckboxGroup,
@@ -10,6 +11,7 @@ import {
   BCol, BFormCheckbox
 } from "bootstrap-vue-next";
 import { createProject, fetchProjects } from './services/api';
+import { ref } from 'vue';
 
 export default {
   components: {
@@ -21,15 +23,11 @@ export default {
     EditProjectModal,
     BFormCheckboxGroup,
     BRow,
-    BCol
+    BCol, AddExistingProject
   },
   data() {
     return {
-      selected1: [],
-      options1: [
-        { item: 'active', name: 'Активный' },
-        { item: 'finished', name: 'Завершенный' },
-      ],
+      showExistingModal: false,
       selected2: [],
       options2: [
         { item: 'vk', name: 'ВК' },
@@ -66,6 +64,10 @@ export default {
       } catch (error) {
         console.error('Error creating project:', error);
       }
+    },
+    handleCodeSubmit(code) {
+      this.submittedCode = code;
+      console.log('Получен код:', code);
     }
   }
 }
@@ -74,23 +76,14 @@ export default {
 <template>
   <GeneralNavBar />
   <div class="app-container">
+    <div>
     <div class="filter-panel">
       <h5 class="filter">Фильтры:</h5>
 
-      <div class="d-inline-flex align-items-center">
-        <BFormCheckbox switch class="me-0"/>
-        <h6 class="titles d-inline archive">Архив</h6>
-      </div>
-
-      <h6 class="titles">Статус проекта</h6>
-      <BFormCheckboxGroup
-          v-model="selected1"
-          :options="options1"
-          value-field="item"
-          text-field="name"
-          stacked
-          class="filter-checkboxes"
-      />
+      <BFormCheckbox 
+        class="filter-checkboxes">
+        Архив
+      </BFormCheckbox>  
 
       <h6 class="titles">Соц. сети</h6>
       <BFormCheckboxGroup
@@ -111,12 +104,23 @@ export default {
           stacked
           class="filter-checkboxes"
       />
-
-      <BButton @click="showCreationModal = true" class="create-btn">
-        Добавить проект
+    </div>
+    <div class="buttons">
+      <BButton @click="showCreationModal = true" class="add-project-card">
+              <div class="add-project-content">
+                <span>Создать проект</span>
+              </div>
       </BButton>
       <EditProjectModal v-model="showCreationModal" @save-project="saveProject" />
+      <BButton  class="add-project-card" @click="showExistingModal = true">
+              <div class="add-project-content">
+                <span>Добавить сущетсвующий</span>
+              </div>
+      </BButton>
+      <AddExistingProject v-model="showExistingModal"
+      @code-submitted="handleCodeSubmit"></AddExistingProject>
     </div>
+  </div>
 
     <div class="projects-panel">
       <BRow class="g-3">
@@ -127,6 +131,7 @@ export default {
             md="6"
             lg="4"
         >
+        
           <ProjectCard
               :title="project.name"
               :tags="getTags(project)"
@@ -148,6 +153,17 @@ export default {
   padding-bottom: 30px;
 }
 
+.add-project-card{
+  margin: 0 30px 10px 30px;
+  background-color: #4a2c40!important;
+  border-radius: 18px!important;
+}
+
+.buttons{
+  display: flex;
+  flex-direction: column;
+}
+
 .filter-panel {
   background: rgba(255, 255, 255, 0.3);
   backdrop-filter: blur(25px);
@@ -159,6 +175,7 @@ export default {
   margin: 30px;
   flex-shrink: 0;
   height: auto;
+  margin-bottom: 20px;
 }
 
 .projects-panel {

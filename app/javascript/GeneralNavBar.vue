@@ -46,7 +46,7 @@ export default {
   <div class="global-header">
     <BContainer class="main-1">
       <div class="nav-item">
-        <router-link class="dropdown-text" to="schedule">Расписание</router-link>
+        <router-link class="logout-btn" to="schedule">Расписание</router-link>
       </div>
       <BDropdown
           class="nav-dropdown"
@@ -56,7 +56,7 @@ export default {
           no-caret
       >
         <template #button-content>
-          <span class="dropdown-text">Мои проекты</span>
+          <router-link class="logout-btn" to="projects">Мои проекты</router-link>
           <span class="custom-caret"></span>
         </template>
         <BDropdownItem>Проект 1</BDropdownItem>

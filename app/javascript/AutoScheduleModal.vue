@@ -7,7 +7,7 @@
           :format="'dd.MM.yyyy'"
           :enable-time-picker="false"
           placeholder="Дата старта"
-          class="form-control form-control-sm mb-3"
+          class="custom-datepicker form-control-sm"
       />
 
       <label class="form-label">Дни публикации:</label>
@@ -15,12 +15,13 @@
           v-model="localSelectedDays"
           :options="weekdays"
           class="mb-3"
+          stacked
       />
     </div>
 
     <template #footer>
-      <BButton variant="primary" @click="handleApply">Применить</BButton>
       <BButton variant="secondary" @click="emit('update:modelValue', false)">Отмена</BButton>
+      <BButton variant="primary" @click="handleApply">Применить</BButton>
     </template>
   </BModal>
 </template>
@@ -77,3 +78,14 @@ function handleApply() {
   emit('update:modelValue', false) // <-- ВАЖНО! Закрываем модалку
 }
 </script>
+
+<style scoped>
+.custom-datepicker :deep(.dp__input) {
+  border: none !important; 
+}
+
+.custom-datepicker :deep(.dp__input_wrap) {
+  border: 1px solid #ced4da !important; 
+  border-radius: 0.25rem !important;
+}
+</style>

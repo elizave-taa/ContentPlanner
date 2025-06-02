@@ -206,6 +206,16 @@ export default defineComponent({
   gap: 8px;
   z-index: 2;
 }
+.cover-actions {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.cover-content:hover .cover-actions {
+  opacity: 1;
+  pointer-events: auto;
+}
 
 .icon-button {
   border: none;

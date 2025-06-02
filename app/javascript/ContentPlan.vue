@@ -1,7 +1,7 @@
 <template>
   <div class="main">
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <BTabs v-model="activeTab" class="custom-tabs">
+      <BTabs v-model="activeTab" pills card class="custom-tabs">
         <BTab
             v-for="(plan, index) in plans"
             :key="plan.platform"
@@ -54,7 +54,7 @@
       </div>
     </div>
 
-    <BButton size="sm" @click="scheduleModal = true" class="page-btn">
+    <BButton size="sm" @click="scheduleModal = true" class="shedule-btn">
       Настроить расписание
     </BButton>
 
@@ -192,6 +192,18 @@ const onDragEnd = () => {
   border: none;
   transition: all 0.3s ease;
   color: #ffffff !important;
+}
+.shedule-btn{
+  background-color: #4a2c40 !important;
+  padding: 10px;
+  font-size: 12px;
+  max-height: 40px;
+  font-weight: 400;
+  border-radius: 8px;
+  border: none;
+  transition: all 0.3s ease;
+  color: #ffffff !important;
+  margin-left: 17px;
 }
 .main{
   border: none !important;

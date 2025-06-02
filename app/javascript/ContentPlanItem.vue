@@ -5,8 +5,9 @@
       <div class="d-flex align-items-center flex-grow-1 me-2">
         <BFormCheckbox
             v-model="localItem.done"
-            switch
             class="me-2"
+            v-b-tooltip.hover
+            title="Опубликовано"
         />
 
         <div v-if="editMode" class="flex-grow-1">
@@ -36,8 +37,10 @@
         >
           {{ type }}
         </BBadge>
-
-        <small v-if="localItem.date" class="text-muted ms-2">
+        <BButton v-if="editMode" variant="danger" size="sm" @click="$emit('remove')">
+        Удалить
+        </BButton>
+        <small v-if="localItem.date && !editMode" class="text-muted ms-2">
           {{ formattedDate }}
         </small>
       </div>
@@ -48,26 +51,25 @@
 
       <!-- Типы публикации как кнопки -->
       <BFormCheckboxGroup
-          v-model="localItem.types"
-          :options="contentTypeOptions"
-          buttons
-          size="sm"
-          class="content-type"
-      />
+      v-model="localItem.types"
+      :options="contentTypeOptions"
+      buttons
+      size="sm"
+      class="content-type"
+      button-variant="secondary"
+    />
 
       <!-- Календарь -->
       <Datepicker
-          v-model="localItem.date"
-          :format="'dd.MM.yyyy'"
-          :enable-time-picker="false"
-          placeholder="Дата"
-          class="form-control form-control-sm"
-          style="max-width: 160px;"
+        v-model="localItem.date"
+        :format="'dd.MM.yyyy'"
+        :enable-time-picker="false"
+        placeholder="Дата"
+        class="custom-datepicker form-control-sm"
+        style="max-width: 160px;"
       />
 
-      <BButton variant="danger" size="sm" @click="$emit('remove')">
-        Удалить
-      </BButton>
+      
     </div>
   </div>
 </template>
@@ -77,7 +79,7 @@ import { computed } from 'vue'
 import {
   BFormCheckbox,
   BFormSelect,
-  BCard,
+  BCard, BTooltip,
   BButton,
   BBadge, BFormInput,
     BFormCheckboxGroup,
@@ -113,9 +115,14 @@ const formattedDate = computed(() => {
 </script>
 
 <style scoped>
+
 .item{
   padding: 5px;
   cursor: pointer;
+}
+
+.content-type {
+  gap: 5px; 
 }
 
 .content-type >>> .btn-secondary,
@@ -123,6 +130,7 @@ const formattedDate = computed(() => {
   background-color: #4a2c40 !important;
   border-color: #4a2c40 !important;
   color: white !important;
+  font-size: 12px;
 }
 
 .content-type :deep(.btn-check:checked + .btn-secondary),
@@ -130,5 +138,14 @@ const formattedDate = computed(() => {
 .content-type :deep(.btn-secondary:active),
 .content-type :deep(.btn-secondary.active) {
   background-color: #9a7890!important;
+}
+
+.custom-datepicker :deep(.dp__input) {
+  border: none !important; 
+}
+
+.custom-datepicker :deep(.dp__input_wrap) {
+  border: 1px solid #ced4da !important; 
+  border-radius: 0.25rem !important;
 }
 </style>
