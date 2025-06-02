@@ -53,10 +53,15 @@
         </div>
       </div>
     </div>
+    <div class="d-flex">
+      <BButton size="sm" @click="scheduleModal = true" class="shedule-btn">
+        Настроить расписание
+      </BButton>
 
-    <BButton size="sm" @click="scheduleModal = true" class="shedule-btn">
-      Настроить расписание
-    </BButton>
+      <BButton size="sm" class="shedule-btn">
+        Очистить Конентен-план
+      </BButton>
+    </div>
 
     <AutoScheduleModal
         :modelValue="scheduleModal"
