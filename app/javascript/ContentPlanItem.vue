@@ -4,43 +4,44 @@
 
       <div class="d-flex align-items-center flex-grow-1 me-2">
         <BFormCheckbox
-            v-model="localItem.done"
+            v-model="localItem.posted"
+            @change="updatePostedStatus"
             class="me-2"
-            v-b-tooltip.hover
             title="Опубликовано"
         />
 
         <div v-if="editMode" class="flex-grow-1">
           <BFormInput
-              v-model="localItem.text"
+              v-model="localItem.title"
               :placeholder="`Публикация #${postNumber}`"
               size="sm"
               class="mb-0"
+              @input="debouncedUpdate"
           />
         </div>
 
         <span
             v-else
-            :style="{ textDecoration: localItem.done ? 'line-through' : 'none' }"
+            :style="{ textDecoration: localItem.posted ? 'line-through' : 'none' }"
             class="text-sm"
         >
-    {{ postNumber }}. {{ localItem.text }}
+    {{ postNumber }}. {{ localItem.title }}
   </span>
       </div>
 
       <div class="d-flex flex-wrap align-items-center">
         <BBadge
-            v-for="(type, i) in localItem.types"
+            v-for="(tag, i) in localItem.tags"
             :key="i"
             variant="secondary"
             class="me-1 mb-1"
         >
-          {{ type }}
+          {{ tag }}
         </BBadge>
         <BButton v-if="editMode" variant="danger" size="sm" @click="$emit('remove')">
         Удалить
         </BButton>
-        <small v-if="localItem.date && !editMode" class="text-muted ms-2">
+        <small v-if="localItem.deadline && !editMode" class="text-muted ms-2">
           {{ formattedDate }}
         </small>
       </div>
@@ -51,31 +52,32 @@
 
       <!-- Типы публикации как кнопки -->
       <BFormCheckboxGroup
-      v-model="localItem.types"
+      v-model="localItem.tags"
       :options="contentTypeOptions"
       buttons
       size="sm"
       class="content-type"
       button-variant="secondary"
+      @change="debouncedUpdate"
     />
 
       <!-- Календарь -->
       <Datepicker
-        v-model="localItem.date"
+        v-model="localItemDate"
         :format="'dd.MM.yyyy'"
         :enable-time-picker="false"
         placeholder="Дата"
         class="custom-datepicker form-control-sm"
         style="max-width: 160px;"
+        @update:model-value="onDateChange"
       />
 
-      
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import {
   BFormCheckbox,
   BFormSelect,
@@ -95,9 +97,42 @@ const props = defineProps({
 })
 const emit = defineEmits(['update:modelValue', 'remove'])
 
-const localItem = computed({
-  get: () => props.modelValue,
-  set: (val) => emit('update:modelValue', val)
+// Create a local copy to avoid direct mutation of props
+const localItem = ref({
+  id: null,
+  title: '',
+  posted: false,
+  deadline: null,
+  platform: '',
+  tags: [],
+  // Legacy fields for backward compatibility
+  text: '',
+  done: false,
+  date: null,
+  types: [],
+  ...props.modelValue
+})
+
+// Computed property for the date picker
+const localItemDate = computed({
+  get() {
+    if (localItem.value.deadline) {
+      return new Date(localItem.value.deadline)
+    }
+    if (localItem.value.date) {
+      return localItem.value.date
+    }
+    return null
+  },
+  set(value) {
+    if (value) {
+      localItem.value.deadline = value.toISOString().split('T')[0]
+      localItem.value.date = value // For backward compatibility
+    } else {
+      localItem.value.deadline = null
+      localItem.value.date = null
+    }
+  }
 })
 
 const contentTypeOptions = [
@@ -108,10 +143,68 @@ const contentTypeOptions = [
 ]
 
 const formattedDate = computed(() => {
-  if (!localItem.value.date) return ''
-  const date = new Date(localItem.value.date)
+  if (!localItem.value.deadline) return ''
+  const date = new Date(localItem.value.deadline)
   return date.toLocaleDateString('ru-RU')
 })
+
+// Watch for external changes and update local copy
+watch(() => props.modelValue, (newValue) => {
+  if (newValue) {
+    localItem.value = {
+      ...localItem.value,
+      ...newValue
+    }
+  }
+}, { deep: true })
+
+// Debounced update function
+let updateTimeout = null
+const debouncedUpdate = () => {
+  clearTimeout(updateTimeout)
+  updateTimeout = setTimeout(() => {
+    emitUpdate()
+  }, 500) // 500ms delay
+}
+
+// Immediate update for posted status
+const updatePostedStatus = () => {
+  // Update backward compatibility fields
+  localItem.value.done = localItem.value.posted
+  emitUpdate()
+}
+
+const onDateChange = (value) => {
+  if (value) {
+    localItem.value.deadline = value.toISOString().split('T')[0]
+    localItem.value.date = value // For backward compatibility
+  } else {
+    localItem.value.deadline = null
+    localItem.value.date = null
+  }
+  debouncedUpdate()
+}
+
+const emitUpdate = () => {
+  // Sync backward compatibility fields
+  localItem.value.text = localItem.value.title
+  localItem.value.done = localItem.value.posted
+  localItem.value.types = localItem.value.tags
+
+  emit('update:modelValue', { ...localItem.value })
+}
+
+// Watch for changes in tags and emit update
+watch(() => localItem.value.tags, () => {
+  localItem.value.types = localItem.value.tags // Keep backward compatibility
+}, { deep: true })
+
+// Set default deadline to today for new items
+if (!localItem.value.id && !localItem.value.deadline) {
+  const today = new Date().toISOString().split('T')[0]
+  localItem.value.deadline = today
+  localItem.value.date = new Date() // For backward compatibility
+}
 </script>
 
 <style scoped>
@@ -122,7 +215,7 @@ const formattedDate = computed(() => {
 }
 
 .content-type {
-  gap: 5px; 
+  gap: 5px;
 }
 
 .content-type >>> .btn-secondary,
@@ -141,11 +234,11 @@ const formattedDate = computed(() => {
 }
 
 .custom-datepicker :deep(.dp__input) {
-  border: none !important; 
+  border: none !important;
 }
 
 .custom-datepicker :deep(.dp__input_wrap) {
-  border: 1px solid #ced4da !important; 
+  border: 1px solid #ced4da !important;
   border-radius: 0.25rem !important;
 }
 </style>

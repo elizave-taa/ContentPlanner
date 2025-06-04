@@ -73,7 +73,11 @@
 
     <div class="main-container">
       <div class="column left-column">
-        <content-plan />
+        <content-plan
+          :projectId="id"
+          :projectSocialLinks="project.socialLinks"
+          v-if="project.socialLinks && id"
+        />
         <a-i-helper />
       </div>
 

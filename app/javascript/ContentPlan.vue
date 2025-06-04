@@ -2,11 +2,7 @@
   <div class="main">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <BTabs v-model="activeTab" pills card class="custom-tabs">
-        <BTab
-            v-for="(plan, index) in plans"
-            :key="plan.platform"
-            :title="plan.platform"
-        />
+        <BTab v-for="(plan, index) in plans" :key="index" :title="getPlatformDisplayName(plan.platform)"/>
       </BTabs>
 
       <div class="d-flex align-items-left">
@@ -21,7 +17,7 @@
 
     <div v-for="(plan, index) in plans" :key="plan.platform" v-show="activeTab === index">
       <div class="p-3">
-        <div v-if="plan.items.length === 0" class=" text-muted">
+        <div v-if="plan.items.length === 0" class="text-muted">
           Пока ещё ничего нет...
         </div>
         <draggable
@@ -38,7 +34,8 @@
               :modelValue="element"
               :editMode="editMode"
               :postNumber="index + 1"
-              @remove="removeItem(index)"
+              @update:modelValue="updateItem"
+              @remove="removeItem(element.id)"
           />
         </template>
         </draggable>
@@ -52,15 +49,15 @@
           <BButton @click="addItem(index)" class="add-btn">+</BButton>
         </div>
       </div>
-    </div>
-    <div class="d-flex">
-      <BButton size="sm" @click="scheduleModal = true" class="shedule-btn">
-        Настроить расписание
-      </BButton>
+      <div class="d-flex">
+        <!-- <BButton size="sm" @click="scheduleModal = true" class="shedule-btn">
+          Настроить расписание
+        </BButton> -->
 
-      <BButton size="sm" class="shedule-btn">
-        Очистить Конентен-план
-      </BButton>
+        <BButton size="sm" class="shedule-btn" @click="clearPlan(index)">
+          Очистить Контент-план
+        </BButton>
+      </div>
     </div>
 
     <AutoScheduleModal
@@ -71,109 +68,280 @@
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
-import {
-  BTabs,
-  BTab,
-  BFormInput,
-  BButton,
-} from 'bootstrap-vue-next'
+<script>
+import { BTabs, BTab, BFormInput, BButton } from 'bootstrap-vue-next'
 import ContentPlanItem from './ContentPlanItem.vue'
-import AutoScheduleModal from "./AutoScheduleModal.vue";
+import AutoScheduleModal from './AutoScheduleModal.vue'
 import draggable from 'vuedraggable'
 import 'bootstrap-icons/font/bootstrap-icons.css'
-import { onMounted, onUnmounted } from 'vue'
+import {
+  fetchContentPlanItems,
+  createContentPlanItem,
+  updateContentPlanItem,
+  deleteContentPlanItem,
+  toggleContentPlanItemPosted
+} from './services/api'
 
-const history = ref({
-  Instagram: [],
-  TikTok: [],
-  VK: []
-})
+export default {
+  name: 'ContentPlanner',
+  components: {
+    BTabs,
+    BTab,
+    BFormInput,
+    BButton,
+    ContentPlanItem,
+    AutoScheduleModal,
+    draggable,
+  },
+  props: {
+    projectId: {
+      type: [String, Number],
+      required: true,
+    },
+    projectSocialLinks: {
+      type: Object,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      plans: [],             // [ { platform: 'telegram', items: [] }, ... ]
+      newItem: [],           // e.g. ['', '', ...]
+      editMode: false,
+      activeTab: 0,
+      scheduleModal: false,
+      platformMapping: {
+        'telegram': 'telegram',
+        'instagram': 'instagram',
+        'vk': 'vkontakte',
+        'youtube': 'youtube',
+        'tiktok': 'tiktok',
+        'yandex': 'yandex_zen'
+      },
+      reverseMapping: {
+        'telegram': 'telegram',
+        'instagram': 'instagram',
+        'vkontakte': 'vk',
+        'youtube': 'youtube',
+        'tiktok': 'tiktok',
+        'yandex_zen': 'yandex'
+      }
+    }
+  },
+  async created() {
+    await this.initializePlans()
+    await this.loadContentPlanItems()
+  },
+  watch: {
+    projectSocialLinks: {
+      deep: true,
+      async handler() {
+        await this.initializePlans()
+        await this.loadContentPlanItems()
+      }
+    }
+  },
+  methods: {
+    async initializePlans() {
+      // Build plans array from projectSocialLinks
+      this.plans = Object.keys(this.projectSocialLinks || {})
+        .filter((key) => this.projectSocialLinks[key])
+        .map((key) => ({
+          platform: this.platformMapping[key] || key,
+          items: []
+        }))
 
-const plans = ref([
-  { platform: 'Instagram', items: [] },
-  { platform: 'TikTok', items: [] },
-  { platform: 'VK', items: [] }
-])
+      // newItem array length should match number of platforms
+      this.newItem = this.plans.map(() => '')
+    },
 
-const newItem = ref(['', '', ''])
-const editMode = ref(false)
-const activeTab = ref(0)
+    async loadContentPlanItems() {
+      try {
+        const items = await fetchContentPlanItems(this.projectId)
 
-const scheduleModal = ref(false)
+        // Group items by platform and sort by deadline
+        this.plans.forEach(plan => {
+          plan.items = items
+            .filter(item => item.platform === plan.platform)
+            .map(item => this.transformApiItemToFrontend(item))
+            .sort((a, b) => {
+              // Sort by deadline, then by created date
+              if (!a.deadline && !b.deadline) return new Date(a.created_at) - new Date(b.created_at)
+              if (!a.deadline) return 1
+              if (!b.deadline) return -1
+              return new Date(a.deadline) - new Date(b.deadline)
+            })
+        })
+      } catch (error) {
+        console.error('Error loading content plan items:', error)
+      }
+    },
 
-function onScheduleApply({ startDate, days }) {
-  alert("понеслась коза по кочкам");
-}
+    transformApiItemToFrontend(apiItem) {
+      return {
+        id: apiItem.id,
+        title: apiItem.title,
+        text: apiItem.title, // For backward compatibility
+        posted: apiItem.posted,
+        done: apiItem.posted, // For backward compatibility
+        deadline: apiItem.deadline,
+        date: apiItem.deadline ? new Date(apiItem.deadline) : null, // For backward compatibility
+        platform: apiItem.platform,
+        tags: apiItem.tags || [],
+        types: apiItem.tags || [], // For backward compatibility
+        created_at: apiItem.created_at,
+        updated_at: apiItem.updated_at
+      }
+    },
 
-function saveToHistory(platform) {
-  const currentItems = [...plans.value.find(p => p.platform === platform).items]
-  history.value[platform].push(currentItems)
+    transformFrontendItemToApi(frontendItem) {
+      return {
+        id: frontendItem.id,
+        title: frontendItem.title || frontendItem.text,
+        posted: frontendItem.posted || frontendItem.done || false,
+        deadline: frontendItem.deadline || (frontendItem.date ? frontendItem.date.toISOString().split('T')[0] : null),
+        platform: frontendItem.platform,
+        tags: frontendItem.tags || frontendItem.types || []
+      }
+    },
 
-  if (history.value[platform].length > 50) {
-    history.value[platform].shift()
-  }
-}
+    getPlatformDisplayName(platform) {
+      const displayNames = {
+        'telegram': 'Telegram',
+        'instagram': 'Instagram',
+        'vkontakte': 'ВКонтакте',
+        'youtube': 'YouTube',
+        'tiktok': 'TikTok',
+        'yandex_zen': 'Яндекс Дзен'
+      }
+      return displayNames[platform] || platform
+    },
 
-function undoLastAction() {
-  const currentPlatform = plans.value[activeTab.value].platform
-  const platformHistory = history.value[currentPlatform]
+    getTodayDate() {
+      return new Date().toISOString().split('T')[0]
+    },
 
-  if (platformHistory.length > 0) {
-    const previousState = platformHistory.pop()
-    plans.value[activeTab.value].items = [...previousState]
-  }
-}
+    async addItem(tabIndex) {
+      const text = this.newItem[tabIndex].trim()
+      if (!text) return
 
-function handleKeyDown(e) {
-  if (e.ctrlKey && e.key === 'z') {
-    e.preventDefault()
-    undoLastAction()
-  }
-}
+      const platform = this.plans[tabIndex].platform
 
-onMounted(() => {
-  window.addEventListener('keydown', handleKeyDown)
-})
+      try {
+        const newItemData = {
+          title: text,
+          posted: false,
+          deadline: this.getTodayDate(), // Set today as default deadline
+          platform: platform,
+          tags: []
+        }
 
-onUnmounted(() => {
-  window.removeEventListener('keydown', handleKeyDown)
-})
+        const createdItem = await createContentPlanItem(this.projectId, newItemData)
+        const frontendItem = this.transformApiItemToFrontend(createdItem)
 
-const addItem = (tabIndex) => {
-  const text = newItem.value[tabIndex].trim()
-  if (!text) return
+        this.plans[tabIndex].items.push(frontendItem)
+        this.sortPlanItems(tabIndex)
+        this.newItem[tabIndex] = ''
+      } catch (error) {
+        console.error('Error creating content plan item:', error)
+        alert('Ошибка при создании публикации')
+      }
+    },
 
-  const platform = plans.value[tabIndex].platform
-  saveToHistory(platform)
+    async updateItem(updatedItem) {
+      try {
+        const apiData = this.transformFrontendItemToApi(updatedItem)
+        const responseItem = await updateContentPlanItem(updatedItem.id, apiData)
 
-  plans.value[tabIndex].items.push({
-    id: Date.now(),
-    text,
-    done: false,
-    types: [],
-    date: new Date()
-  })
-  newItem.value[tabIndex] = ''
-}
+        // Find and update the item in the plans
+        this.plans.forEach((plan, planIndex) => {
+          const itemIndex = plan.items.findIndex(item => item.id === updatedItem.id)
+          if (itemIndex !== -1) {
+            plan.items[itemIndex] = this.transformApiItemToFrontend(responseItem)
+            this.sortPlanItems(planIndex)
+          }
+        })
+      } catch (error) {
+        console.error('Error updating content plan item:', error)
+        alert('Ошибка при обновлении публикации')
+      }
+    },
 
-const removeItem = (index) => {
-  const platform = plans.value[activeTab.value].platform
-  saveToHistory(platform)
+    async removeItem(itemId) {
+      try {
+        await deleteContentPlanItem(itemId)
 
-  plans.value.forEach(plan => {
-    plan.items.splice(index, 1)
-  })
-}
+        // Remove from frontend
+        this.plans.forEach(plan => {
+          const index = plan.items.findIndex(item => item.id === itemId)
+          if (index !== -1) {
+            plan.items.splice(index, 1)
+          }
+        })
+      } catch (error) {
+        console.error('Error deleting content plan item:', error)
+        alert('Ошибка при удалении публикации')
+      }
+    },
 
-const handleDragMove = () => {
-  if (!editMode.value) return false
-}
+    async toggleItemPosted(itemId) {
+      try {
+        const responseItem = await toggleContentPlanItemPosted(itemId)
 
-const onDragEnd = () => {
-  const platform = plans.value[activeTab.value].platform
-  saveToHistory(platform)
+        // Update in frontend
+        this.plans.forEach(plan => {
+          const item = plan.items.find(item => item.id === itemId)
+          if (item) {
+            item.posted = responseItem.posted
+            item.done = responseItem.posted // For backward compatibility
+          }
+        })
+      } catch (error) {
+        console.error('Error toggling posted status:', error)
+        alert('Ошибка при изменении статуса публикации')
+      }
+    },
+
+    sortPlanItems(tabIndex) {
+      this.plans[tabIndex].items.sort((a, b) => {
+        // Sort by deadline, then by created date
+        if (!a.deadline && !b.deadline) return new Date(a.created_at) - new Date(b.created_at)
+        if (!a.deadline) return 1
+        if (!b.deadline) return -1
+        return new Date(a.deadline) - new Date(b.deadline)
+      })
+    },
+
+    onScheduleApply({ startDate, days }) {
+      alert('понеслась коза по кочкам');
+    },
+
+    handleDragMove() {
+      if (!this.editMode) return false
+    },
+
+    onDragEnd() {
+      // Auto-sort after drag ends
+      this.sortPlanItems(this.activeTab)
+    },
+
+    async clearPlan(index) {
+      if (!confirm('Вы уверены, что хотите очистить контент-план для этой платформы?')) return
+
+      try {
+        // Delete all items for this platform
+        const itemsToDelete = this.plans[index].items.slice()
+        for (const item of itemsToDelete) {
+          await deleteContentPlanItem(item.id)
+        }
+
+        this.plans[index].items = []
+      } catch (error) {
+        console.error('Error clearing content plan:', error)
+        alert('Ошибка при очистке контент-плана')
+      }
+    },
+  },
 }
 </script>
 

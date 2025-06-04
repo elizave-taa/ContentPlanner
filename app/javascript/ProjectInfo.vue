@@ -68,7 +68,7 @@
     <div class="mb-3">
       <strong>Назначенные специалисты:</strong>
       <ul class="mb-0">
-        <li>
+        <li v-if="project.creator">
           {{ project.creator.username }} <span class="text-muted">({{ project.creator.email }})</span>
         </li>
         <li v-for="(person, index) in project.specialists" :key="index">
