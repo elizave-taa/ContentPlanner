@@ -2,7 +2,7 @@ class ContentPlanItem < ApplicationRecord
   belongs_to :project
 
   # Platform enum matching the social platforms from projects
-  enum platform: {
+  enum :platform, {
     telegram: 0,
     instagram: 1,
     vkontakte: 2,
