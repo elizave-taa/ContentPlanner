@@ -48,6 +48,30 @@ module Api
       render json: @content_plan_item
     end
 
+        # GET /api/content_plan_items/today
+    def today
+      today_and_overdue_items = ContentPlanItem.joins(:project)
+                                               .joins("LEFT JOIN project_specialists ON projects.id = project_specialists.project_id")
+                                               .where(
+                                                 "(projects.creator_id = ? OR project_specialists.user_id = ?) AND content_plan_items.deadline <= ? AND content_plan_items.posted = ?",
+                                                 current_user.id,
+                                                 current_user.id,
+                                                 Date.current,
+                                                 false
+                                               )
+                                               .includes(:project)
+                                               .order(:deadline, :created_at)
+
+      render json: today_and_overdue_items.map { |item|
+        item.as_json.merge(
+          project_name: item.project.name,
+          platform_name: item.platform_name,
+          overdue: item.overdue?,
+          due_today: item.due_today?
+        )
+      }
+    end
+
     private
 
     def authenticate_user!

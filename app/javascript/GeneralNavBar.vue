@@ -1,7 +1,8 @@
 <script>
 import { BContainer, BDropdown, BDropdownItem, BButton } from "bootstrap-vue-next"
 import Notifications from "./Notifications.vue"
-import { ref } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { fetchTodaysContentPlanItems } from './services/api'
 
 export default {
   components: {
@@ -14,18 +15,60 @@ export default {
   setup() {
     const notificationButton = ref(null)
     const notifications = ref(null)
-    const unreadCount = ref(3)
+    const notificationsList = ref([])
+    const unreadCount = ref(0)
+    const refreshInterval = ref(null)
+
+    const loadNotifications = async () => {
+      try {
+        const todaysItems = await fetchTodaysContentPlanItems()
+        notificationsList.value = todaysItems
+
+        // Calculate unread count (items that are not posted and due today or overdue)
+        unreadCount.value = todaysItems.filter(item => !item.posted).length
+      } catch (error) {
+        console.error('Error loading notifications:', error)
+        notificationsList.value = []
+        unreadCount.value = 0
+      }
+    }
 
     const showNotifications = () => {
       notifications.value.show()
-      unreadCount.value = 0 // Сбрасываем счетчик при открытии уведомлений
+      // Don't reset unread count here - only reset when items are actually dealt with
     }
+
+    const markAsRead = () => {
+      // Reset unread count when user has seen the notifications
+      unreadCount.value = 0
+    }
+
+    const refreshNotifications = () => {
+      loadNotifications()
+    }
+
+    onMounted(() => {
+      // Load notifications immediately
+      loadNotifications()
+
+      // Set up periodic refresh every 5 minutes
+      refreshInterval.value = setInterval(loadNotifications, 5 * 60 * 1000)
+    })
+
+    onBeforeUnmount(() => {
+      if (refreshInterval.value) {
+        clearInterval(refreshInterval.value)
+      }
+    })
 
     return {
       notificationButton,
       notifications,
+      notificationsList,
       unreadCount,
-      showNotifications
+      showNotifications,
+      markAsRead,
+      refreshNotifications
     }
   },
   methods: {
@@ -57,11 +100,16 @@ export default {
         <span class="badge" v-if="unreadCount > 0">{{ unreadCount }}</span>
       </div>
 
-      <Notifications :button-ref="notificationButton" ref="notifications" />
+      <Notifications
+        :button-ref="notificationButton"
+        :notifications="notificationsList"
+        @marked-as-read="markAsRead"
+        @refresh-requested="refreshNotifications"
+        ref="notifications"
+      />
 
-      <!-- Кнопка выхода -->
       <div class="nav-item">
-        <router-link class="logout-btn" to="/logout">Выход</router-link>
+        <a href="/logout" class="logout-btn">Выход</a>
       </div>
     </BContainer>
   </div>
@@ -157,6 +205,11 @@ export default {
   margin-left: auto;
   cursor: pointer;
   padding: 8px 12px;
+  transition: opacity 0.2s ease;
+}
+
+.notification-icon:hover {
+  opacity: 0.8;
 }
 
 .badge {
@@ -166,33 +219,26 @@ export default {
   background-color: #ff4757;
   color: white;
   border-radius: 50%;
-  width: 16px;
+  min-width: 16px;
   height: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 10px;
   font-weight: bold;
+  padding: 0 2px;
+  animation: pulse 2s infinite;
 }
-.notification-icon {
-  position: relative;
-  margin-left: auto;
-  cursor: pointer;
-  padding: 8px 12px;
-}
-.badge {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  background-color: #ff4757;
-  color: white;
-  border-radius: 50%;
-  width: 16px;
-  height: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  font-weight: bold;
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 </style>

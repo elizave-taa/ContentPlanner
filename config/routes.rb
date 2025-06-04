@@ -18,6 +18,9 @@ Rails.application.routes.draw do
       member do
         patch :toggle_posted
       end
+      collection do
+        get :today
+      end
     end
 
     resources :users, only: [:index]

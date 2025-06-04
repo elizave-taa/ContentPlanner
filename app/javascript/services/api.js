@@ -178,6 +178,14 @@ export const toggleContentPlanItemPosted = async (id) => {
   return await response.json();
 };
 
+export const fetchTodaysContentPlanItems = async () => {
+  const response = await fetch('/api/content_plan_items/today', {
+    credentials: 'same-origin'
+  });
+  if (!response.ok) throw new Error('Failed to fetch today\'s content plan items');
+  return await response.json();
+};
+
 function encodeFileToBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
