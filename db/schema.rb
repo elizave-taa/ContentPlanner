@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_04_085408) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_04_092137) do
   create_table "content_plan_items", force: :cascade do |t|
     t.integer "project_id", null: false
     t.text "title", null: false
@@ -68,6 +68,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_04_085408) do
     t.index ["project_id"], name: "index_project_reference_links_on_project_id"
   end
 
+  create_table "project_specialists", force: :cascade do |t|
+    t.integer "project_id", null: false
+    t.integer "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["project_id", "user_id"], name: "index_project_specialists_on_project_id_and_user_id", unique: true
+    t.index ["project_id"], name: "index_project_specialists_on_project_id"
+    t.index ["user_id"], name: "index_project_specialists_on_user_id"
+  end
+
   create_table "projects", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
@@ -82,6 +92,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_04_085408) do
     t.string "yandex_zen_url"
     t.boolean "is_archived"
     t.binary "cover"
+    t.string "code"
+    t.date "expire_in"
     t.index ["creator_id"], name: "index_projects_on_creator_id"
   end
 
@@ -100,5 +112,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_04_085408) do
   add_foreign_key "project_map_links", "projects"
   add_foreign_key "project_photos", "projects"
   add_foreign_key "project_reference_links", "projects"
+  add_foreign_key "project_specialists", "projects"
+  add_foreign_key "project_specialists", "users"
   add_foreign_key "projects", "users", column: "creator_id"
 end
