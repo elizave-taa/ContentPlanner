@@ -5,11 +5,22 @@ Rails.application.routes.draw do
   namespace :api do
     post '/register', to: 'users#create'
     post '/login', to: 'auth#create'
+    post '/projects/join', to: 'projects#join_project'
     resources :projects, only: [:create, :update, :index, :show, :destroy] do
       member do
         patch :archive
+        patch :update_cover
+      end
+      resources :content_plan_items, only: [:index, :create]
+    end
+
+    resources :content_plan_items, only: [:show, :update, :destroy] do
+      member do
+        patch :toggle_posted
       end
     end
+
+    resources :users, only: [:index]
   end
 
   get '/logout', to: 'api/auth#destroy'

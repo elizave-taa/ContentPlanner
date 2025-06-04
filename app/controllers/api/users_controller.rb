@@ -25,6 +25,11 @@ module Api
       end
     end
 
+    def index
+      users = User.all
+      render json: users, only: [:id, :username, :email, :phone_number]
+    end
+
     private
 
     def user_params

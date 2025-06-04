@@ -26,7 +26,7 @@
     data() {
       return {
         project: {
-          
+
         },
       }
     },
@@ -51,9 +51,16 @@
         try {
           this.project = await archiveProject(this.id, true);
           alert('Проект перемещен в архив');
-          this.$router.push('/projects');
         } catch (error) {
           alert('Ошибка при перемещении в архив');
+        }
+      },
+      async restoreProject() {
+        try {
+          this.project = await archiveProject(this.id, false);
+          alert('Проект восстановлен');
+        } catch (error) {
+          alert('Ошибка при восстановлении проекта');
         }
       }
     }
@@ -71,7 +78,7 @@
       </div>
 
       <div class="column right-column">
-        <manage-project :project="project" @save-project="saveProject" @delete-project="deleteProject" @archive-project="archiveProject" />
+        <manage-project :project="project" @save-project="saveProject" @delete-project="deleteProject" @archive-project="archiveProject" @restore-project="restoreProject" />
         <project-info :project="project"/>
       </div>
     </div>

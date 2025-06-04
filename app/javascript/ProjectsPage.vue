@@ -10,7 +10,7 @@ import {
   BRow,
   BCol, BFormCheckbox
 } from "bootstrap-vue-next";
-import { createProject, fetchProjects } from './services/api';
+import { createProject, fetchProjects, joinProject, fetchUsers } from './services/api';
 import { ref } from 'vue';
 
 export default {
@@ -34,27 +34,24 @@ export default {
         { item: 'telegram', name: 'Telegram' },
         { item: 'instagram', name: 'Instagram' },
         { item: 'youtube', name: 'YouTube' },
-        { item: 'yandex', name: 'Yandex' },
-        { item: 'tiktok', name: 'Yandex' },
+        { item: 'yandex', name: 'Яндекс Дзен' },
+        { item: 'tiktok', name: 'TikTok' },
       ],
       selected3: [],
-      specialists: [
-        { item: '1', name: 'Специалист 1' },
-        { item: '2', name: 'Специалист 2' },
-      ],
+      selectedArchived: false,
       showModal: false,
       showCreationModal: false,
-      projects: []
+      projects: [],
+      specialists: []
     }
   },
   async created() {
     this.projects = await fetchProjects();
     console.log(this.projects)
+    this.specialists = await fetchUsers();
+    console.log(this.specialists)
   },
   methods: {
-    getTags(project) {
-      return Object.keys(project.socialLinks).filter(key => project.socialLinks[key]);
-    },
     async saveProject(projectData) {
       this.showCreationModal = false;
       try {
@@ -65,10 +62,34 @@ export default {
         console.error('Error creating project:', error);
       }
     },
-    handleCodeSubmit(code) {
-      this.submittedCode = code;
+    async handleCodeSubmit(code) {
       console.log('Получен код:', code);
+      try {
+        const joinedProject = await joinProject(code);
+        this.projects.push(joinedProject);
+        this.showExistingModal = false;
+      } catch (error) {
+        this.$refs.addExistingProjectRef.resetCode();
+        alert('Не удалось добавиться к проекту');
+      }
     }
+  },
+  computed: {
+    filteredProjects() {
+      return this.projects.filter(project => {
+        if (this.selected2.length > 0) {
+          const projectSocialLinks = Object.keys(project.socialLinks).filter(key => project.socialLinks[key]);
+          return projectSocialLinks.some(link => this.selected2.includes(link));
+        }
+        return true;
+      }).filter(project => !this.selectedArchived || project.is_archived)
+      .filter(project => {
+        if (this.selected3.length > 0) {
+          return this.selected3.includes(project.creator.username) || project.specialists.some(specialist => this.selected3.includes(specialist.username));
+        }
+        return true;
+      });
+    },
   }
 }
 </script>
@@ -80,10 +101,11 @@ export default {
     <div class="filter-panel">
       <h5 class="filter">Фильтры:</h5>
 
-      <BFormCheckbox 
-        class="filter-checkboxes">
+      <BFormCheckbox
+        class="filter-checkboxes"
+        v-model="selectedArchived">
         Архив
-      </BFormCheckbox>  
+      </BFormCheckbox>
 
       <h6 class="titles">Соц. сети</h6>
       <BFormCheckboxGroup
@@ -98,7 +120,7 @@ export default {
       <h6 class="titles">Специалисты</h6>
       <BFormCheckboxGroup
           v-model="selected3"
-          :options="specialists"
+          :options="specialists.map(user => user.username)"
           value-field="item"
           text-field="name"
           stacked
@@ -114,10 +136,10 @@ export default {
       <EditProjectModal v-model="showCreationModal" @save-project="saveProject" />
       <BButton  class="add-project-card" @click="showExistingModal = true">
               <div class="add-project-content">
-                <span>Добавить сущетсвующий</span>
+                <span>Добавить существующий</span>
               </div>
       </BButton>
-      <AddExistingProject v-model="showExistingModal"
+      <AddExistingProject v-model="showExistingModal" ref="addExistingProjectRef"
       @code-submitted="handleCodeSubmit"></AddExistingProject>
     </div>
   </div>
@@ -125,19 +147,21 @@ export default {
     <div class="projects-panel">
       <BRow class="g-3">
         <BCol
-            v-for="project in projects"
+            v-if="filteredProjects.length > 0"
+            v-for="project in filteredProjects"
             :key="project.id"
             cols="12"
             md="6"
             lg="4"
         >
-        
-          <ProjectCard
-              :title="project.name"
-              :tags="getTags(project)"
-              :date="project.created_at"
-              :id="project.id"
-          />
+
+          <ProjectCard :project="project"/>
+        </BCol>
+        <BCol v-else>
+          <div class="no-projects-message">
+            <h4>Нет проектов</h4>
+            <p>Создайте новый проект или добавьте существующий</p>
+          </div>
         </BCol>
       </BRow>
     </div>

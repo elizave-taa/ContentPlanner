@@ -31,6 +31,7 @@
     <BButton
         class="action-btn"
         v-if="project.is_archived"
+        @click="restoreProject"
     >
       Восстановить
     </BButton>
@@ -56,7 +57,7 @@
 
       <div class="modal-content">
         <p>Отправьте этот код сотруднику:</p>
-        <div class="code-display">{{ uniqueCode }}</div>
+        <div class="code-display">{{ project.code }}</div>
         <p class="small-text">Код действителен в течение 24 часов</p>
       </div>
     </BModal>
@@ -112,23 +113,10 @@ export default {
       showAssignModal: false,
       showDeleteModal: false,
       showArchiveModal: false,
-      uniqueCode: this.generateCode(),
       showEditModal: false,
     }
   },
   methods: {
-    generateCode() {
-      // Генерация 6-значного кода
-      return Math.floor(100000 + Math.random() * 900000)
-    },
-    copyCode() {
-      navigator.clipboard.writeText(this.uniqueCode)
-      this.$bvToast.toast('Код скопирован в буфер обмена', {
-        title: 'Успешно',
-        variant: 'success',
-        autoHideDelay: 3000
-      })
-    },
     saveProject(project) {
       this.$emit('save-project', project)
     },
@@ -152,6 +140,9 @@ export default {
       //   variant: 'success',
       //   autoHideDelay: 5000
       // })
+    },
+    restoreProject() {
+      this.$emit('restore-project');
     }
   }
 }

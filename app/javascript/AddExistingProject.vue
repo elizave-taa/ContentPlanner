@@ -5,6 +5,7 @@
     title="Введите код доступа"
     @hidden="resetModal"
     @ok="handleOk"
+    v-model="modalShow"
   >
     <form ref="form" @submit.stop.prevent="handleSubmit">
       <BFormGroup
@@ -32,10 +33,26 @@ export default {
     BFormInput,
     BFormGroup
   },
+  props: {
+    modelValue: {
+      type: Boolean,
+      default: false
+    }
+  },
   data() {
     return {
       code: '',
       codeState: null
+    }
+  },
+  computed: {
+    modalShow: {
+      get() {
+        return this.modelValue;
+      },
+      set(value) {
+        this.$emit('update:modelValue', value);
+      }
     }
   },
   methods: {
@@ -45,8 +62,8 @@ export default {
       return valid;
     },
     resetModal() {
-      this.code = '';
-      this.codeState = null;
+      this.$emit('close-modal');
+      this.resetCode();
     },
     handleOk(bvModalEvent) {
       bvModalEvent.preventDefault();
@@ -57,15 +74,10 @@ export default {
         return;
       }
       this.$emit('code-submitted', this.code);
-      this.$nextTick(() => {
-        this.$bvModal.hide('code-modal');
-      });
     },
-    show() {
-      this.$bvModal.show('code-modal');
-    },
-    hide() {
-      this.$bvModal.hide('code-modal');
+    resetCode() {
+      this.code = '';
+      this.codeState = null;
     }
   }
 }

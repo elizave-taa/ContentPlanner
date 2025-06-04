@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_04_092137) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_04_110209) do
   create_table "content_plan_items", force: :cascade do |t|
     t.integer "project_id", null: false
     t.text "title", null: false
@@ -94,6 +94,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_04_092137) do
     t.binary "cover"
     t.string "code"
     t.date "expire_in"
+    t.string "url"
     t.index ["creator_id"], name: "index_projects_on_creator_id"
   end
 

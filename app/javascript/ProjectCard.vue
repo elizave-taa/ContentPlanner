@@ -2,11 +2,18 @@
 import { BBadge, BButton, BCard } from "bootstrap-vue-next";
 
 defineProps({
-  title: String,
-  tags: Array,
-  date: String,
-  id: Number,
+  project: {
+    type: Object,
+    required: true,
+  },
 })
+
+const getTags = (project) => {
+  return Object.keys(project.socialLinks).filter(key => project.socialLinks[key]).map(key => ({
+    name: key,
+    variant: getVariant(key)
+  }));
+}
 
 // Функция для определения Bootstrap variant
 const getVariant = (tag) => {
@@ -30,26 +37,26 @@ const getVariant = (tag) => {
 </script>
 
 <template>
-  <router-link :to="{ name: 'project', params: { id: id } }" class="card-link">
+  <router-link :to="{ name: 'project', params: { id: project.id } }" class="card-link">
     <div class="card-wrapper">
       <BCard tag="article" class="blur-card">
         <div class="card-image-container">
-          <img src="/images/illustration.png" alt="Card image" class="card-image" />
+          <img :src="project.coverUrl || '/images/illustration.png'" alt="Card image" class="card-image" />
           <div class="image-gradient"></div>
-          <div class="card-title">{{ title }}</div>
+          <div class="card-title">{{ project.name }} {{ project.is_archived ? '(В архиве)' : '' }}</div>
         </div>
 
         <div class="card-body">
           <div class="badges-container">
             <BBadge
-                v-for="(tag, i) in tags"
+                v-for="(tag, i) in getTags(project)"
                 :key="i"
-                :variant="getVariant(tag)"
+                :variant="tag.variant"
             >
-              {{ tag }}
+              {{ tag.name }}
             </BBadge>
           </div>
-          <div class="publication-date">Публикация: {{ date }}</div>
+          <div class="publication-date">Публикация: {{ project.created_at }}</div>
         </div>
       </BCard>
     </div>

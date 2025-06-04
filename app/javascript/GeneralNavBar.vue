@@ -48,35 +48,9 @@ export default {
       <div class="nav-item">
         <router-link class="logout-btn" to="/schedule">Расписание</router-link>
       </div>
-      <BDropdown
-          class="nav-dropdown"
-          ref="projectsDropdown"
-          @mouseenter="showDropdown('projectsDropdown')"
-          @mouseleave="hideDropdown('projectsDropdown')"
-          no-caret
-      >
-        <template #button-content>
-          <router-link class="logout-btn" to="projects">Мои проекты</router-link>
-          <span class="custom-caret"></span>
-        </template>
-        <BDropdownItem>Проект 1</BDropdownItem>
-        <BDropdownItem>Проект 2</BDropdownItem>
-      </BDropdown>
-
-      <BDropdown
-          class="nav-dropdown"
-          ref="specialistsDropdown"
-          @mouseenter="showDropdown('specialistsDropdown')"
-          @mouseleave="hideDropdown('specialistsDropdown')"
-          no-caret
-      >
-        <template #button-content>
-          <span class="dropdown-text">Специалисты</span>
-          <span class="custom-caret"></span>
-        </template>
-        <BDropdownItem>Специалист 1</BDropdownItem>
-        <BDropdownItem>Специалист 2</BDropdownItem>
-      </BDropdown>
+      <div class="nav-item">
+        <router-link class="logout-btn" to="/projects">Проекты</router-link>
+      </div>
 
       <div class="notification-icon" ref="notificationButton" @click="showNotifications">
         <img src="/images/notifications.svg" alt="Уведомления">
@@ -86,13 +60,9 @@ export default {
       <Notifications :button-ref="notificationButton" ref="notifications" />
 
       <!-- Кнопка выхода -->
-      <BButton
-          class="logout-btn"
-          variant="link"
-          @click="logout"
-      >
-        Выход
-      </BButton>
+      <div class="nav-item">
+        <router-link class="logout-btn" to="/logout">Выход</router-link>
+      </div>
     </BContainer>
   </div>
 </template>
@@ -118,7 +88,7 @@ export default {
   font-weight: 200;
   cursor: pointer;
   line-height: 15px;
-  margin-right: 40px;
+  margin-right: 5px;
 }
 .nav-dropdown >>> .dropdown-toggle {
   background: none !important;
@@ -171,7 +141,6 @@ export default {
 .logout-btn {
   color: white !important;
   text-decoration: none;
-  margin-left: 20px;
   padding: 8px 16px;
   font-size: 15px;
   font-weight: 200;

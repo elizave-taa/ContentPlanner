@@ -4,10 +4,10 @@
       <div
           class="cover-content"
           :style="{
-          backgroundImage: coverFile
-            ? `linear-gradient(to top, rgba(0,0,0,0.6), rgba(0,0,0,0)), url(${coverUrl})`
-            : 'none',
-          backgroundColor: coverFile ? 'transparent' : defaultColor
+          backgroundImage: project.coverUrl
+            ? `linear-gradient(to top, rgba(0,0,0,0.6), rgba(0,0,0,0)), url(${project.coverUrl})`
+            : 'none !important',
+          backgroundColor: project.coverUrl ? 'transparent' : defaultColor
         }"
       >
         <div v-if="!project.is_archived" class="cover-actions">
@@ -65,11 +65,14 @@
       <p v-else class="text-muted">Нет данных</p>
     </div>
 
-    <div class="mb-3" v-if="project.specialists?.length">
+    <div class="mb-3">
       <strong>Назначенные специалисты:</strong>
       <ul class="mb-0">
+        <li>
+          {{ project.creator.username }} <span class="text-muted">({{ project.creator.email }})</span>
+        </li>
         <li v-for="(person, index) in project.specialists" :key="index">
-          {{ person.name }} <span class="text-muted">({{ person.role }})</span>
+          {{ person.username }} <span class="text-muted">({{ person.email }})</span>
         </li>
       </ul>
     </div>
@@ -89,6 +92,7 @@
 <script>
 import { defineComponent } from 'vue'
 import { BBadge } from 'bootstrap-vue-next'
+import { updateProjectCover } from './services/api'
 
 export default defineComponent({
   name: 'ProjectPreview',
@@ -123,10 +127,6 @@ export default defineComponent({
         references: { title: 'Профили-референсы' },
       }
     },
-    coverUrl() {
-      if (this.coverFile) return URL.createObjectURL(this.coverFile)
-      return this.project.coverUrl || this.defaultCover
-    }
   },
   methods: {
     getSocialName(key) {
@@ -149,12 +149,22 @@ export default defineComponent({
       const i = Math.floor(Math.log(bytes) / Math.log(1024))
       return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${sizes[i]}`
     },
-    onCoverChange(event) {
-      const file = event.target.files[0]
-      if (file) this.coverFile = file
+    async onCoverChange(event) {
+      try {
+        const file = event.target.files[0]
+        await updateProjectCover(this.project.id, file)
+        window.location.reload()
+      } catch (error) {
+        alert('Ошибка при обновлении обложки')
+      }
     },
-    removeCover() {
-      this.coverFile = null
+    async removeCover() {
+      try {
+        await updateProjectCover(this.project.id, null)
+        window.location.reload()
+      } catch (error) {
+        alert('Ошибка при удалении обложки')
+      }
     },
   },
 })
