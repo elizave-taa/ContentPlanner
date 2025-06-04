@@ -46,7 +46,7 @@ export default {
   <div class="global-header">
     <BContainer class="main-1">
       <div class="nav-item">
-        <router-link class="logout-btn" to="schedule">Расписание</router-link>
+        <router-link class="logout-btn" to="/schedule">Расписание</router-link>
       </div>
       <BDropdown
           class="nav-dropdown"
