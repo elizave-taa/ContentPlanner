@@ -10,7 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_05_31_125255) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_04_085408) do
+  create_table "content_plan_items", force: :cascade do |t|
+    t.integer "project_id", null: false
+    t.text "title", null: false
+    t.boolean "posted", default: false
+    t.date "deadline"
+    t.integer "platform", null: false
+    t.json "tags", default: []
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["deadline"], name: "index_content_plan_items_on_deadline"
+    t.index ["platform"], name: "index_content_plan_items_on_platform"
+    t.index ["posted"], name: "index_content_plan_items_on_posted"
+    t.index ["project_id"], name: "index_content_plan_items_on_project_id"
+  end
+
   create_table "project_design_links", force: :cascade do |t|
     t.integer "project_id", null: false
     t.string "url"
@@ -66,6 +81,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_31_125255) do
     t.string "tiktok_url"
     t.string "yandex_zen_url"
     t.boolean "is_archived"
+    t.binary "cover"
     t.index ["creator_id"], name: "index_projects_on_creator_id"
   end
 
@@ -78,6 +94,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_31_125255) do
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "content_plan_items", "projects"
   add_foreign_key "project_design_links", "projects"
   add_foreign_key "project_files", "projects"
   add_foreign_key "project_map_links", "projects"
