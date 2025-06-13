@@ -49,7 +49,11 @@ module Api
 
     # POST /api/projects/:project_id/content_plan_items
     def create
-      @content_plan_item = @project.content_plan_items.build(content_plan_item_params)
+      @content_plan_item = @project.content_plan_items.build(
+        content_plan_item_params.except(:deadline)
+      )
+      @content_plan_item.deadline =
+        next_deadline_for(@project, @content_plan_item.platform)
 
       if @content_plan_item.save
         render json: @content_plan_item, status: :created
@@ -148,8 +152,53 @@ module Api
       end
     end
 
+    def next_deadline_for(project, platform)
+      schedule = project.schedule
+      today    = Date.current
+
+      # Если расписания нет или нет дней — просто сегодня
+      return today unless schedule&.weekdays&.any?
+
+      # Последний айтем по платформе (с самым большим дедлайном)
+      last_item = project.content_plan_items
+                         .where(platform: platform)
+                         .where.not(deadline: nil)
+                         .order(deadline: :desc)
+                         .first
+
+      # Откуда начинаем поиск:
+      # — если есть последний дедлайн, то с day_after = last.deadline + 1
+      # — иначе от schedule.start_date или today, что позже
+      start_date =
+        if last_item
+          [last_item.deadline + 1.day, today].max
+        else
+          [schedule.start_date, today].max
+        end
+
+      # Преобразуем строковые дни в числа 0..6
+      wday_map = {
+        'sunday'    => 0,
+        'monday'    => 1,
+        'tuesday'   => 2,
+        'wednesday' => 3,
+        'thursday'  => 4,
+        'friday'    => 5,
+        'saturday'  => 6
+      }
+      desired_wdays = schedule.weekdays.map { |wd| wday_map[wd.downcase] }.compact
+
+      # Просто бежим по дням, пока не найдём первый подходящий
+      date = start_date
+      loop do
+        return date if desired_wdays.include?(date.wday)
+        date = date.next_day
+      end
+    end
+
     def content_plan_item_params
-      params.require(:content_plan_item).permit(:title, :posted, :deadline, :platform, tags: [])
+      params.require(:content_plan_item)
+            .permit(:title, :posted, :deadline, :platform, tags: [])
     end
   end
 end

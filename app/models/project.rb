@@ -13,6 +13,7 @@ class Project < ApplicationRecord
   has_many :project_reference_links, dependent: :destroy
   has_many :project_files, dependent: :destroy
   has_many :content_plan_items, dependent: :destroy
+  has_one :schedule, dependent: :destroy
 
   # Many-to-many relationship with users as specialists
   has_many :project_specialists, dependent: :destroy

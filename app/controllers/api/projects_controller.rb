@@ -16,6 +16,7 @@ module Api
           :project_files,
           :content_plan_items,
           :specialists,
+          :schedule,
           :creator
         ], status: :created
       else
@@ -38,6 +39,7 @@ module Api
           :project_files,
           :content_plan_items,
           :specialists,
+          :schedule,
           :creator
         ]
       else
@@ -68,6 +70,7 @@ module Api
         :project_files,
         :content_plan_items,
         :specialists,
+        :schedule,
         :creator
       ]
     end
@@ -97,6 +100,7 @@ module Api
           :project_files,
           :content_plan_items,
           :specialists,
+          :schedule,
           :creator
         ], status: :ok
       else
@@ -147,6 +151,7 @@ module Api
         :project_files,
         :content_plan_items,
         :specialists,
+        :schedule,
         :creator
       ], status: :ok
     end
@@ -161,7 +166,8 @@ module Api
         project_design_links_attributes: [:id, :url, :_destroy],
         project_reference_links_attributes: [:id, :url, :_destroy],
         project_files_attributes: [:id, :filename, :data, :_destroy],
-        content_plan_items_attributes: [:id, :title, :posted, :deadline, :platform, :_destroy, tags: []]
+        content_plan_items_attributes: [:id, :title, :posted, :deadline, :platform, :_destroy, tags: []],
+        schedule_attributes: [:id, :start_date, :weekdays]
       )
     end
   end

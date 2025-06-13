@@ -50,9 +50,9 @@
         </div>
       </div>
       <div class="d-flex">
-        <!-- <BButton size="sm" @click="scheduleModal = true" class="shedule-btn">
+        <BButton size="sm" @click="scheduleModal = true" class="shedule-btn">
           Настроить расписание
-        </BButton> -->
+        </BButton>
 
         <BButton size="sm" class="shedule-btn" @click="clearPlan(index)">
           Очистить Контент-план
@@ -62,6 +62,7 @@
 
     <AutoScheduleModal
         :modelValue="scheduleModal"
+        :projectId="projectId"
         @apply="onScheduleApply"
         @update:modelValue="val => scheduleModal = val"
     />
@@ -79,7 +80,8 @@ import {
   createContentPlanItem,
   updateContentPlanItem,
   deleteContentPlanItem,
-  toggleContentPlanItemPosted
+  toggleContentPlanItemPosted,
+  upsertSchedule
 } from './services/api'
 
 export default {
@@ -312,8 +314,19 @@ export default {
       })
     },
 
-    onScheduleApply({ startDate, days }) {
-      alert('понеслась коза по кочкам');
+    async onScheduleApply({ startDate, days }) {
+      try {
+        const scheduleData = {
+          startDate: new Date(startDate),
+          weekdays: days
+        }
+        await upsertSchedule(this.projectId, scheduleData)
+        this.scheduleModal = false
+        this.loadContentPlanItems()
+      } catch (error) {
+        console.error('Error applying schedule:', error)
+        alert('Ошибка при применении расписания')
+      }
     },
 
     handleDragMove() {

@@ -12,6 +12,9 @@ Rails.application.routes.draw do
         patch :update_cover
       end
       resources :content_plan_items, only: [:index, :create]
+      resource :schedule, only: [] do
+        patch '/', to: 'schedules#update'
+      end
     end
 
     resources :content_plan_items, only: [:show, :update, :destroy] do

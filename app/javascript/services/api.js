@@ -211,6 +211,29 @@ export const fetchUsers = async () => {
   return await response.json();
 };
 
+export const upsertSchedule = async (projectId, scheduleData) => {
+  const url = `/api/projects/${projectId}/schedule`
+  const body = {
+    schedule: {
+      // Rails ждёт YYYY-MM-DD
+      start_date: scheduleData.startDate.toISOString().slice(0, 10),
+      weekdays:   scheduleData.weekdays
+    }
+  }
+
+  const response = await fetch(url, {
+    method: 'PATCH',
+    credentials: 'same-origin',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  })
+  if (!response.ok) {
+    const err = await response.json().catch(() => null)
+    throw new Error(err?.error || 'Failed to save schedule')
+  }
+  return await response.json()
+}
+
 function transformProjectToFrontend(project) {
   return {
     ...project,
@@ -233,7 +256,8 @@ function transformProjectToFrontend(project) {
     }),
     contentPlanItems: project.content_plan_items || [],
     specialists: project.specialists || [],
-    coverUrl: project.cover ? `data:image/jpeg;base64,${project.cover}` : null
+    coverUrl: project.cover ? `data:image/jpeg;base64,${project.cover}` : null,
+    schedule: project.schedule || {}
   };
 }
 
@@ -268,6 +292,7 @@ export const transformProjectToApi = async (project) => {
     project_design_links_attributes: (project.designLinks || []),
     project_reference_links_attributes: (project.references || []),
     project_files_attributes: encodedFiles,
-    content_plan_items_attributes: (project.contentPlanItems || [])
+    content_plan_items_attributes: (project.contentPlanItems || []),
+    schedule_attributes: project.schedule || {}
   };
 };

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_04_110209) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_13_224705) do
   create_table "content_plan_items", force: :cascade do |t|
     t.integer "project_id", null: false
     t.text "title", null: false
@@ -98,6 +98,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_04_110209) do
     t.index ["creator_id"], name: "index_projects_on_creator_id"
   end
 
+  create_table "schedules", force: :cascade do |t|
+    t.integer "project_id", null: false
+    t.date "start_date", null: false
+    t.json "weekdays", default: [], null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["project_id"], name: "index_schedules_on_project_id", unique: true
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "username"
     t.string "email"
@@ -116,4 +125,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_04_110209) do
   add_foreign_key "project_specialists", "projects"
   add_foreign_key "project_specialists", "users"
   add_foreign_key "projects", "users", column: "creator_id"
+  add_foreign_key "schedules", "projects"
 end
