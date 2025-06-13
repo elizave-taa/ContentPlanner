@@ -139,6 +139,16 @@ export const fetchContentPlanItems = async (projectId) => {
   return await response.json();
 };
 
+export const fetchContentPlanItemsByMonthAll = async (year, month) => {
+  const url = `/api/content_plan_items/by_month?year=${year}&month=${month}`;
+  const response = await fetch(url, { credentials: 'same-origin' });
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to fetch content plan items by month');
+  }
+  return await response.json();
+};
+
 export const createContentPlanItem = async (projectId, itemData) => {
   const response = await fetch(`/api/projects/${projectId}/content_plan_items`, {
     method: 'POST',

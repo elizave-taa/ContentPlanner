@@ -20,6 +20,7 @@ Rails.application.routes.draw do
       end
       collection do
         get :today
+        get :by_month
       end
     end
 

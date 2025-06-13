@@ -121,6 +121,9 @@ export default {
   background-color: #4a2c40;
   position: relative;
   z-index: 10;
+  position: sticky;
+  top: 0;
+  left: 0;
 }
 .main-1 {
   display: flex;

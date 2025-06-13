@@ -11,6 +11,37 @@ module Api
       render json: @project.content_plan_items.order(:deadline, :created_at)
     end
 
+    def by_month
+      y = params[:year].to_i
+      m = params[:month].to_i
+
+      # вычисляем границы месяца
+      start_date = Date.new(y, m, 1)
+      end_date   = start_date.end_of_month
+
+      items = ContentPlanItem
+        .joins(:project)
+        .joins("LEFT JOIN project_specialists ON projects.id = project_specialists.project_id")
+        .where(
+          "(projects.creator_id = :uid OR project_specialists.user_id = :uid)
+           AND content_plan_items.deadline BETWEEN :start_date AND :end_date",
+          uid: current_user.id,
+          start_date: start_date,
+          end_date:   end_date
+        )
+        .includes(:project)
+        .order(:deadline, :created_at)
+
+      render json: items.map { |item|
+        item.as_json(only: %i[id title posted deadline platform tags]).merge(
+          project_name:  item.project.name,
+          platform_name: item.platform_name,
+          overdue:       item.overdue?,
+          due_today:     item.due_today?
+        )
+      }
+    end
+
     # GET /api/content_plan_items/:id
     def show
       render json: @content_plan_item
