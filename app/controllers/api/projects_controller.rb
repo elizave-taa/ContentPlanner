@@ -49,9 +49,21 @@ module Api
 
     # GET /api/projects
     def index
-      projects = Project.where('creator_id = ? OR id IN (SELECT project_id FROM project_specialists WHERE user_id = ?)',
-                             current_user.id, current_user.id)
-      render json: projects, include: [ :specialists, :creator ]
+      projects = Project
+        .where('creator_id = ? OR id IN (
+                 SELECT project_id
+                 FROM project_specialists
+                 WHERE user_id = ?
+               )',
+               current_user.id, current_user.id)
+        .includes(:specialists, :creator, :next_content_plan_item)
+
+      render json: projects,
+             include: [
+               :specialists,
+               :creator,
+               :next_content_plan_item
+             ]
     end
 
     # GET /api/projects/:id
@@ -167,7 +179,6 @@ module Api
         project_reference_links_attributes: [:id, :url, :_destroy],
         project_files_attributes: [:id, :filename, :data, :_destroy],
         content_plan_items_attributes: [:id, :title, :posted, :deadline, :platform, :_destroy, tags: []],
-        schedule_attributes: [:id, :start_date, :weekdays]
       )
     end
   end

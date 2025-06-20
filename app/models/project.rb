@@ -15,6 +15,13 @@ class Project < ApplicationRecord
   has_many :content_plan_items, dependent: :destroy
   has_one :schedule, dependent: :destroy
 
+  has_one :next_content_plan_item,
+          -> {
+            where('deadline >= ?', Date.current)
+              .order(deadline: :asc)
+          },
+          class_name: 'ContentPlanItem'
+
   # Many-to-many relationship with users as specialists
   has_many :project_specialists, dependent: :destroy
   has_many :specialists, through: :project_specialists, source: :user

@@ -19,7 +19,10 @@
         class="publication"
         :class="{ missed: !pub.posted && pub.overdue }"
       >
-        {{ pub.title }}
+        <span class="publication-content">
+          <span v-if="!pub.posted && pub.overdue" class="badge">!</span>
+          {{ pub.project_name }}: {{ pub.title }}
+        </span>
       </div>
     </div>
   </div>
@@ -35,7 +38,6 @@ export default {
     }
   },
   computed: {
-    // Возвращает строку вида "01.10", "05.06", "31.12" и т.д.
     formattedDate() {
       const d = this.day.date.getDate();
       const m = this.day.date.getMonth() + 1;
@@ -48,48 +50,61 @@ export default {
 </script>
 
 <style scoped>
- .day {
-   padding: 10px;
-   display: flex;
-   flex-direction: column;
-   background: rgba(255,255,255,0.3);
-   backdrop-filter: blur(25px);
-   border-radius: 18px;
-   height: 100%;
-   position: relative;           /* для псевдо-элементов, если захотите */
- }
- .day-header {
-   display: flex;
-   justify-content: space-between;
-   margin-bottom: 5px;
-   font-weight: bold;
- }
- .weekday { color: #666; }
- .date    { color: #333; }
+.day {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  background: rgba(255,255,255,0.3);
+  backdrop-filter: blur(25px);
+  border-radius: 18px;
+  height: 100%;
+  position: relative;
+}
+.day-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+.weekday { color: #666; }
+.date    { color: #333; }
 
 .today {
-  background-color: #e6f7ff;   /* прежний фон */
-  border: 2px solid #1890ff;   /* подчёркиваем границей */
+  background-color: #e6f7ff;
+  border: 2px solid #1890ff;
   box-shadow: 0 0 0 4px rgba(24,144,255,0.2);
 }
 
- .missed-publication { background-color: #fff0f0; }
+.missed-publication { background-color: #fff0f0; }
 
- .publications {
-   flex: 1;
-   display: flex;
-   flex-direction: column;
- }
- .publication {
-   padding: 4px 6px;
-   margin-bottom: 4px;
-   border-radius: 4px;
-   border: 1px solid #4a2c40;
-   background: #fff;
-   font-size: .9em;
- }
- .publication.missed {
-   background-color: #f44336;
-   color: #fff;
- }
+.publications {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.publication {
+  padding: 4px 6px;
+  margin-bottom: 4px;
+  border-radius: 4px;
+  border: 1px solid #4a2c40;
+  background: #fff;
+  font-size: .9em;
+  display: flex;
+}
+.publication-content {
+  font-size: 14px;
+}
+.publication.missed {
+  background-color: #fff;
+  color: inherit;
+}
+.badge {
+  background-color: #f44336;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 12px;
+  font-size: 0.75em;
+  font-weight: bold;
+  margin-left: 8px;
+}
 </style>

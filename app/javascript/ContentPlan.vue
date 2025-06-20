@@ -53,10 +53,6 @@
         <BButton size="sm" @click="scheduleModal = true" class="shedule-btn">
           Настроить расписание
         </BButton>
-
-        <BButton size="sm" class="shedule-btn" @click="clearPlan(index)">
-          Очистить Контент-план
-        </BButton>
       </div>
     </div>
 

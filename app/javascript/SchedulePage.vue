@@ -59,7 +59,6 @@ export default {
   },
 
   mounted() {
-    // Один раз — стартовая подгрузка и инициализация скролла
     this.loadInitialMonths();
     this.$nextTick(() => {
       this.setupScrollObserver();
@@ -81,7 +80,6 @@ export default {
         const m = new Date(today.getFullYear(), today.getMonth() + i, 1);
         return { month: m.getMonth(), year: m.getFullYear() };
       });
-      // сброс флага после рендера
       this.$nextTick(() => { this.loading = false; });
     },
 
@@ -93,7 +91,6 @@ export default {
       const chunk = [];
 
       if (direction === "before") {
-        // три месяца до centerDate
         base.setMonth(base.getMonth() - this.monthsPerLoad);
         for (let i = 0; i < this.monthsPerLoad; i++) {
           const m = new Date(base.getFullYear(), base.getMonth() + i, 1);
@@ -101,7 +98,6 @@ export default {
         }
         this.visibleMonths = [...chunk, ...this.visibleMonths];
       } else {
-        // три месяца после centerDate
         base.setMonth(base.getMonth() + 1);
         for (let i = 0; i < this.monthsPerLoad; i++) {
           const m = new Date(base.getFullYear(), base.getMonth() + i, 1);
@@ -110,7 +106,6 @@ export default {
         this.visibleMonths = [...this.visibleMonths, ...chunk];
       }
 
-      // если prepend — сохраняем позицию
       this.$nextTick(() => {
         if (direction === "before") {
           const c = this.$refs.scrollContainer;
@@ -164,12 +159,10 @@ export default {
       const c = this.$refs.scrollContainer;
       const { scrollTop, scrollHeight, clientHeight } = c;
 
-      // докрутка вниз
       if (scrollTop + clientHeight >= scrollHeight - 200) {
         const last = this.visibleMonths[this.visibleMonths.length - 1];
         this.loadMoreMonths(new Date(last.year, last.month, 1), "after");
       }
-      // докрутка вверх
       if (scrollTop <= 200) {
         const first = this.visibleMonths[0];
         this.loadMoreMonths(new Date(first.year, first.month, 1), "before");

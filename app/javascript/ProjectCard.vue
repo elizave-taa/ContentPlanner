@@ -1,12 +1,14 @@
 <script setup>
 import { BBadge, BButton, BCard } from "bootstrap-vue-next";
+import { format } from 'date-fns';
+import { ru } from 'date-fns/locale';
 
-defineProps({
+const props = defineProps({
   project: {
     type: Object,
     required: true,
   },
-})
+});
 
 const getTags = (project) => {
   return Object.keys(project.socialLinks).filter(key => project.socialLinks[key]).map(key => ({
@@ -34,6 +36,11 @@ const getVariant = (tag) => {
       return 'secondary'
   }
 }
+
+// Функция форматирования даты
+const formatDate = (date) => {
+  return format(new Date(date), 'd MMMM yyyy', { locale: ru });
+}
 </script>
 
 <template>
@@ -56,7 +63,8 @@ const getVariant = (tag) => {
               {{ tag.name }}
             </BBadge>
           </div>
-          <div class="publication-date">Публикация: {{ project.created_at }}</div>
+          <div v-if="project.next_content_plan_item != null" class="publication-date">Публикация: {{ formatDate(project.next_content_plan_item.deadline) }}</div>
+          <div v-if="project.next_content_plan_item == null" class="publication-date">Публикаций пока нет</div>
         </div>
       </BCard>
     </div>
