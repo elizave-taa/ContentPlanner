@@ -58,16 +58,37 @@ export default {
     }
   },
   methods: {
-    askAI() {
+    async askAI() {
       if (!this.userInput.trim()) return
 
       this.loading = true
       this.response = null
 
-      setTimeout(() => {
-        this.response = `ИИ проанализировал ваш запрос "${this.userInput}" и предлагает следующие идеи:\n\n1. Провести конкурс среди подписчиков\n2. Создать серию сторис с закулисьем\n3. Запустить опрос о предпочтениях аудитории`
+      try {
+        const res = await fetch('/api/ai/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+          },
+          body: JSON.stringify({
+            message: this.userInput
+          })
+        })
+
+        if (!res.ok) {
+          const errText = await res.text()
+          throw new Error(`API Error ${res.status}: ${errText}`)
+        }
+
+        const data = await res.json()
+        this.response = data.choices[0].message.content.trim()
+      } catch (err) {
+        console.error('askAI error', err)
+        this.response = `Ошибка при обращении к ИИ: ${err.message}`
+      } finally {
         this.loading = false
-      }, 2000)
+      }
     }
   }
 }

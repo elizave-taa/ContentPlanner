@@ -6,6 +6,10 @@ Rails.application.routes.draw do
     post '/register', to: 'users#create'
     post '/login', to: 'auth#create'
     post '/projects/join', to: 'projects#join_project'
+
+    # AI endpoints
+    post '/ai/chat', to: 'ai#chat'
+
     resources :projects, only: [:create, :update, :index, :show, :destroy] do
       member do
         patch :archive
