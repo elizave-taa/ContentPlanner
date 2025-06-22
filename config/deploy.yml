@@ -1,13 +1,13 @@
 # Name of your application. Used to uniquely configure containers.
-service: vue_sample
+service: content_planner
 
 # Name of the container image.
-image: your-user/vue_sample
+image: elizavetea/content_planner
 
 # Deploy to these servers.
 servers:
   web:
-    - 192.168.0.1
+    - 45.12.143.128
   # job:
   #   hosts:
   #     - 192.168.0.1
@@ -25,11 +25,10 @@ proxy:
 registry:
   # Specify the registry server, if you're not using Docker Hub
   # server: registry.digitalocean.com / ghcr.io / ...
-  username: your-user
+  username: elizavetea
 
   # Always use an access token rather than real password when possible.
-  password:
-    - KAMAL_REGISTRY_PASSWORD
+  password: gzBRdSfSw5Rqpp
 
 # Inject ENV variables into containers (secrets come from .kamal/secrets).
 env:
@@ -76,6 +75,8 @@ asset_path: /rails/public/assets
 # Configure the image builder.
 builder:
   arch: amd64
+  context: .                         
+  dockerfile: Dockerfile
 
   # # Build image via remote server (useful for faster amd64 builds on arm64 computers)
   # remote: ssh://docker@docker-builder-server
@@ -88,8 +89,10 @@ builder:
   #   - RAILS_MASTER_KEY
 
 # Use a different ssh user than root
-# ssh:
-#   user: app
+ssh:
+  user: root
+  keys:
+    - .kamal/key
 
 # Use accessory services (secrets come from .kamal/secrets).
 # accessories:
